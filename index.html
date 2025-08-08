@@ -1,63 +1,24 @@
-import React from "react"; import { Card, CardContent } from "@/components/ui/card"; import { Button } from "@/components/ui/button"; import { Mail, Instagram, Twitter } from "lucide-react";
-
-const teamMembers = [ { name: "Alex", role: "Designer" }, { name: "Sam", role: "Developer" }, { name: "Rae", role: "Photographer" }, { name: "Kai", role: "Writer" }, ];
-
-const projects = [ { title: "Project Alpha", description: "Experimental visual storytelling using AI and motion." }, { title: "Urban Echoes", description: "Collaborative photo+poetry project capturing city life." }, ];
-
-export default function Suahco4Site() { return ( <div className="min-h-screen bg-white text-gray-800 px-6 py-12 space-y-24"> <header className="text-center space-y-4"> <h1 className="text-5xl font-bold tracking-tight">suahco4</h1> <p className="text-lg text-gray-600">A creative collective blending design, code, and story.</p> </header>
-
-<section id="about" className="max-w-3xl mx-auto text-center space-y-4">
-    <h2 className="text-3xl font-semibold">About Us</h2>
-    <p>
-      suahco4 is a creative collective of multidisciplinary artists, developers, and storytellers
-      collaborating on projects that blend technology, narrative, and design.
-    </p>
-  </section>
-
-  <section id="team" className="max-w-4xl mx-auto">
-    <h2 className="text-3xl font-semibold mb-6 text-center">Team Members</h2>
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-      {teamMembers.map((member) => (
-        <Card key={member.name} className="rounded-2xl shadow">
-          <CardContent className="p-6">
-            <h3 className="text-xl font-bold">{member.name}</h3>
-            <p className="text-sm text-gray-500">{member.role}</p>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
-  </section>
-
-  <section id="projects" className="max-w-4xl mx-auto">
-    <h2 className="text-3xl font-semibold mb-6 text-center">Projects</h2>
-    <div className="space-y-6">
-      {projects.map((project) => (
-        <Card key={project.title} className="rounded-2xl shadow">
-          <CardContent className="p-6">
-            <h3 className="text-xl font-bold">{project.title}</h3>
-            <p className="text-sm text-gray-500 mt-2">{project.description}</p>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
-  </section>
-
-  <section id="blog" className="max-w-3xl mx-auto text-center space-y-4">
-    <h2 className="text-3xl font-semibold">Blog</h2>
-    <p className="text-gray-500">Coming soon: insights, updates, and behind-the-scenes posts from the suahco4 crew.</p>
-  </section>
-
-  <footer id="contact" className="text-center pt-12 border-t mt-24 space-y-4">
-    <h2 className="text-2xl font-semibold">Contact</h2>
-    <p>We'd love to hear from you.</p>
-    <div className="flex justify-center gap-6">
-      <Button variant="ghost" size="icon"><Mail /></Button>
-      <Button variant="ghost" size="icon"><Instagram /></Button>
-      <Button variant="ghost" size="icon"><Twitter /></Button>
-    </div>
-    <p className="text-sm text-gray-400 mt-4">© 2025 suahco4. All rights reserved.</p>
-  </footer>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birthday Wish</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+    <div class="container">
+    <h1>🎂 Happy Birthday! 🎉</h1>
+    <input type="text" id="nameInput" placeholder="Enter your name">
+    <button onclick="showWish()">Get Your Wish</button>
+    <div id="wish" class="wish"></div>
 </div>
-
-); }
-
+</div>
+    <canvas id="confetti-canvas"></canvas>
+    <script src="script.js"></script>
+    <footer>
+    <p>Made with ❤️ for your special day! &copy; 2025 Birthday Wish</p>
+</footer>
+</body>
+</html>
