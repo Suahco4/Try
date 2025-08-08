@@ -163,3 +163,53 @@ document.getElementById('profilePicInput').addEventListener('change', function(e
     };
     reader.readAsDataURL(file);
 });
+// Modal open/close logic
+const openProfileModal = document.getElementById('openProfileModal');
+const profileModal = document.getElementById('profileModal');
+const closeProfileModal = document.getElementById('closeProfileModal');
+const profileForm = document.getElementById('profileForm');
+const profilePic = document.getElementById('profilePic');
+const profileName = document.getElementById('profileName');
+const modalName = document.getElementById('modalName');
+const modalPic = document.getElementById('modalPic');
+
+// Open modal
+openProfileModal.addEventListener('click', () => {
+    profileModal.style.display = 'flex';
+    modalName.value = profileName.textContent !== "Guest" ? profileName.textContent : "";
+});
+
+// Close modal
+closeProfileModal.addEventListener('click', () => {
+    profileModal.style.display = 'none';
+});
+
+// Close modal when clicking outside content
+window.addEventListener('click', (e) => {
+    if (e.target === profileModal) {
+        profileModal.style.display = 'none';
+    }
+});
+
+// Handle form submit
+profileForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    // Update name
+    const nameValue = modalName.value.trim() || "Guest";
+    profileName.textContent = nameValue;
+    // Update profile picture if a new one is selected
+    if (modalPic.files && modalPic.files[0]) {
+        const file = modalPic.files[0];
+        if (!file.type.startsWith('image/')) {
+            alert('Please upload an image file.');
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+            profilePic.src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+    // If no new image, keep the old one
+    profileModal.style.display = 'none';
+});
