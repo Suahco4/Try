@@ -1,0 +1,145 @@
+body {
+    background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+    min-height: 100vh;
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.container {
+    background: rgba(255,255,255,0.9);
+    padding: 40px 30px;
+    border-radius: 20px;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+    text-align: center;
+    width: 350px;
+}
+
+h1 {
+    margin-bottom: 20px;
+    color: #ff6f61;
+    font-size: 2.2em;
+}
+
+input[type="text"] {
+    padding: 10px;
+    width: 80%;
+    border: 1px solid #ffb88c;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-size: 1em;
+}
+
+button {
+    padding: 10px 25px;
+    background: #ff6f61;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+button:hover {
+    background: #ffb88c;
+}
+
+.wish {
+    margin-top: 25px;
+    font-size: 1.3em;
+    color: #ff6f61;
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 0.6s, transform 0.6s;
+}
+
+.wish.show {
+    opacity: 1;
+    transform: scale(1.05);
+    animation: pop 0.6s;
+}
+
+@keyframes pop {
+    0% { transform: scale(0.7);}
+    70% { transform: scale(1.1);}
+    100% { transform: scale(1);}
+}
+body {
+    min-height: 100vh;
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(270deg, #ffecd2, #fcb69f, #a1c4fd, #c2e9fb, #fbc2eb, #fdcbf1, #a1ffce, #faffd1, #fcb69f);
+    background-size: 1800% 1800%;
+    animation: gradientBG 18s ease infinite;
+}
+
+@keyframes gradientBG {
+    0% {background-position: 0% 50%;}
+    50% {background-position: 100% 50%;}
+    100% {background-position: 0% 50%;}
+}
+#confetti-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 0;
+}
+.container {
+    position: relative;
+    z-index: 1;
+    /* ...rest of your styles */
+}
+footer {
+    width: 89%;
+    text-align: center;
+    padding: 15px 0 10px 0;
+    background: rgba(255, 255, 255, 0.7);
+    color: #ff6f61;
+    font-size: 1.05em;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    z-index: 2;
+    letter-spacing: 0.5px;
+    box-shadow: 0 -2px 12px 0 rgba(31, 38, 135, 0.07);
+    backdrop-filter: blur(2px);
+}
+.container {
+    position: relative;
+    z-index: 1;
+    background: rgba(255,255,255,0.9);
+    padding: 40px 30px;
+    border-radius: 20px;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+    text-align: center;
+    width: 350px;
+    /* Remove border if you have one */
+    overflow: hidden;
+}
+
+/* Animated border using a pseudo-element */
+.container::before {
+    content: "";
+    position: absolute;
+    top: -4px; left: -4px; right: -4px; bottom: -4px;
+    z-index: -1;
+    border-radius: 24px;
+    padding: 0;
+    background: linear-gradient(270deg, #ff6f61, #fcb69f, #a1c4fd, #fbc2eb, #fdcbf1, #a1ffce, #faffd1, #ffecd2, #ff6f61);
+    background-size: 1800% 1800%;
+    animation: borderAnimation 8s linear infinite;
+}
+
+@keyframes borderAnimation {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
