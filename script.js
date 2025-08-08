@@ -92,3 +92,60 @@ function animateConfetti() {
 
 initConfetti();
 animateConfetti();
+
+function showWishPopup() {
+    const name = document.getElementById('nameInput').value.trim();
+    if (name === "") {
+        alert("Please enter your name!");
+        return;
+    }
+
+    // Open a new window
+    const popup = window.open("", "BirthdayWish", "width=400,height=300,top=200,left=400");
+
+    // Write HTML content to the new window
+    popup.document.write(`
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <title>Happy Birthday!</title>
+            <style>
+                body {
+                    margin: 0;
+                    padding: 0;
+                    background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+                    font-family: 'Segoe UI', sans-serif;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    height: 100vh;
+                }
+                .wish-popup {
+                    background: rgba(255,255,255,0.95);
+                    border-radius: 18px;
+                    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+                    padding: 30px 20px;
+                    text-align: center;
+                    font-size: 1.3em;
+                    color: #ff6f61;
+                    animation: pop 0.7s;
+                }
+                @keyframes pop {
+                    0% { transform: scale(0.7);}
+                    70% { transform: scale(1.1);}
+                    100% { transform: scale(1);}
+                }
+            </style>
+        </head>
+        <body>
+            <div class="wish-popup">
+                <h2>🎉 Happy Birthday! 🎂</h2>
+                <p>Happy Birthday, <b>${name}</b>!<br>
+                Wishing you a day filled with joy and surprises! 🎈</p>
+            </div>
+        </body>
+        </html>
+    `);
+
+    popup.document.close();
+}
