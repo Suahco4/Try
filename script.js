@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- API Communication Layer ---
     // This should be the URL of your deployed backend server (e.g., from Render).
     // IMPORTANT: Replace this with your actual backend URL once it is deployed.
-    const API_BASE_URL = 'https://online-report-card-frontend.onrender.com/'; 
+    const API_BASE_URL = 'https://backend-wf9k.onrender.com'; 
 
     // Function to Fetch a single student's data from the backend
     async function getStudent(id) {

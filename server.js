@@ -2,6 +2,10 @@ const express = require('express');
 const cors = require('cors');
 const studentsData = require('./data.js'); // Import our mock database
 
+// --- DEBUGGING STEP ---
+// This will print the loaded data to your terminal when the server starts.
+console.log('Data loaded from data.js:', studentsData);
+
 const app = express();
 const PORT = process.env.PORT || 3000; // Use Render's port or 3000 for local dev
 
