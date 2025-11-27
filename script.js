@@ -6,39 +6,34 @@ document.addEventListener('DOMContentLoaded', () => {
     const logoutBtn = document.getElementById('logout-btn');
     const printBtn = document.getElementById('print-btn');
 
-    // --- Database Functions (copied from admin.js for access) ---
-    function getReportCardsDB() {
-        const dbString = localStorage.getItem('reportCardsDB');
-        if (dbString) {
-            return JSON.parse(dbString);
-        } else {
-            // Default data if DB is empty
-            return {
-                "12345": {
-                    name: "John Doe",
-                    grades: [{ subject: "Math", p1: 95, p2: 92, p3: 88, exam1: 90, p4: 91, p5: 94, p6: 89, exam2: 93 }]
-                }
-            };
+    // --- API Communication Layer ---
+    // This should be the URL of your deployed backend server (e.g., from Render).
+    const API_BASE_URL = 'https://report-card-api.onrender.com'; // Replace if your URL is different
+
+    // Function to Fetch a single student's data from the backend
+    async function getStudent(id) {
+        const response = await fetch(`${API_BASE_URL}/api/students/${id}`);
+        if (!response.ok) {
+            throw new Error('Student not found');
         }
+        return await response.json();
     }
 
     // --- Login Logic ---
-    loginForm.addEventListener('submit', (e) => {
+    loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const name = document.getElementById('student-name').value.trim();
         const id = document.getElementById('student-id').value.trim();
-        const db = getReportCardsDB();
 
-        const studentData = db[id];
-
-        if (studentData && studentData.name.toLowerCase() === name.toLowerCase()) {
-            displayReportCard(studentData, id);
-            loginSection.classList.remove('active');
-            loginSection.classList.add('hidden');
-            reportSection.classList.remove('hidden');
-            reportSection.classList.add('active');
-            errorMessage.classList.add('hidden');
-        } else {
+        try {
+            const studentData = await getStudent(id); // Fetch student data from the API
+            if (studentData && studentData.name.toLowerCase() === name.toLowerCase()) {
+                displayReportCard(studentData, id);
+                showSection('report');
+            } else {
+                errorMessage.classList.remove('hidden');
+            }
+        } catch (error) {
             errorMessage.classList.remove('hidden');
         }
     });
@@ -47,15 +42,29 @@ document.addEventListener('DOMContentLoaded', () => {
     logoutBtn.addEventListener('click', () => {
         loginForm.reset();
         reportSection.classList.remove('active');
-        reportSection.classList.add('hidden');
-        loginSection.classList.remove('hidden');
-        loginSection.classList.add('active');
+        showSection('login');
     });
 
     // --- Print Logic ---
     printBtn.addEventListener('click', () => {
         window.print();
     });
+
+    // Helper function to switch between login and report sections
+    function showSection(sectionName) {
+        if (sectionName === 'report') {
+            loginSection.classList.remove('active');
+            loginSection.classList.add('hidden');
+            reportSection.classList.remove('hidden');
+            reportSection.classList.add('active');
+            errorMessage.classList.add('hidden');
+        } else { // 'login'
+            reportSection.classList.remove('active');
+            reportSection.classList.add('hidden');
+            loginSection.classList.remove('hidden');
+            loginSection.classList.add('active');
+        }
+    }
 
     // --- Report Card Display Logic ---
     function displayReportCard(studentData, studentId) {

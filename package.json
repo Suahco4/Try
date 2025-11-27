@@ -1,0 +1,14 @@
+{
+  "name": "online-report-card-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for the Online Report Card application.",
+  "main": "index.html",
+  "scripts": {
+    "start": "serve -s ."
+  },
+  "dependencies": {
+    "serve": "^14.2.3"
+  },
+  "author": "",
+  "license": "ISC"
+}
