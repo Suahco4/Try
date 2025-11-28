@@ -1,0 +1,267 @@
+document.addEventListener('DOMContentLoaded', () => {
+    const loginSection = document.getElementById('login-section');
+    const reportSection = document.getElementById('report-section');
+    const loginForm = document.getElementById('login-form');
+    const errorMessage = document.getElementById('error-message');
+    const logoutBtn = document.getElementById('logout-btn');
+    const printBtn = document.getElementById('print-btn');
+
+    // --- API Communication Layer ---
+    // This should be the URL of your deployed backend server (e.g., from Render).
+    // IMPORTANT: Replace this with your actual backend URL once it is deployed.
+    const API_BASE_URL = 'https://backend-wf9k.onrender.com'; 
+
+    // Function to Fetch a single student's data from the backend
+    async function getStudent(id) {
+        const response = await fetch(`${API_BASE_URL}/api/students/${id}`);
+        if (!response.ok) {
+            throw new Error('Student not found');
+        }
+        return await response.json();
+    }
+
+    // --- Login Logic ---
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('student-name').value.trim();
+        const id = document.getElementById('student-id').value.trim();
+
+        try {
+            const studentData = await getStudent(id); // Fetch student data from the API
+            if (studentData && studentData.name.toLowerCase() === name.toLowerCase()) {
+                displayReportCard(studentData, id);
+                showSection('report');
+            } else {
+                errorMessage.classList.remove('hidden');
+            }
+        } catch (error) {
+            errorMessage.classList.remove('hidden');
+        }
+    });
+
+    // --- Logout Logic ---
+    logoutBtn.addEventListener('click', () => {
+        loginForm.reset();
+        reportSection.classList.remove('active');
+        showSection('login');
+    });
+
+    // --- Print Logic ---
+    printBtn.addEventListener('click', () => {
+        window.print();
+    });
+
+    // Helper function to switch between login and report sections
+    function showSection(sectionName) {
+        if (sectionName === 'report') {
+            loginSection.classList.remove('active');
+            loginSection.classList.add('hidden');
+            reportSection.classList.remove('hidden');
+            reportSection.classList.add('active');
+            errorMessage.classList.add('hidden');
+        } else { // 'login'
+            reportSection.classList.remove('active');
+            reportSection.classList.add('hidden');
+            loginSection.classList.remove('hidden');
+            loginSection.classList.add('active');
+        }
+    }
+
+    // --- Report Card Display Logic ---
+
+    /**
+     * Groups periods into semesters based on the presence of exam periods.
+     * e.g., [p1, p2, exam1, p3, p4, exam2] -> [[p1, p2, exam1], [p3, p4, exam2]]
+     * @param {Array<Object>} activePeriods - Array of period objects {id, name, type}.
+     * @returns {Array<Array<Object>>} An array of semester arrays.
+     */
+    function groupPeriodsIntoSemesters(activePeriods) {
+        const semesters = [];
+        let currentSemester = [];
+        // Sort periods to ensure logical order (p1, p2, exam1, p3...)
+        activePeriods.sort((a, b) => {
+            const aNum = parseInt(a.id.replace(/\D/g, ''));
+            const bNum = parseInt(b.id.replace(/\D/g, ''));
+            if (a.type !== b.type) return a.type === 'exam' ? 1 : -1; // exams last
+            return aNum - bNum;
+        });
+
+        for (const period of activePeriods) {
+            currentSemester.push(period);
+            if (period.type === 'exam') {
+                semesters.push(currentSemester);
+                currentSemester = [];
+            }
+        }
+        // Add any remaining periods if they don't end with an exam
+        if (currentSemester.length > 0) {
+            semesters.push(currentSemester);
+        }
+        return semesters.length > 0 ? semesters : [activePeriods];
+    }
+
+    /**
+     * Builds the HTML for the table header (thead).
+     * @param {Array<Array<Object>>} semesters - An array of semester arrays.
+     * @returns {string} The inner HTML for the thead element.
+     */
+    function buildTableHeader(semesters) {
+        let headerHTML = '<tr><th class="subject-col">Subject</th>';
+        semesters.forEach((semesterPeriods, index) => {
+            semesterPeriods.forEach(p => headerHTML += `<th>${p.name}</th>`);
+            if (semesterPeriods.length > 0) headerHTML += `<th>Sem ${index + 1} Avg</th>`;
+        });
+        headerHTML += '<th>Final Avg</th></tr>';
+        return headerHTML;
+    }
+
+    /**
+     * Builds the HTML for the table body (tbody) with all subjects and their grades.
+     * @param {Array<Object>} grades - The array of grade data for the student.
+     * @param {Array<Array<Object>>} semesters - An array of semester arrays.
+     * @returns {string} The inner HTML for the tbody element.
+     */
+    function buildTableBody(grades, semesters) {
+        let bodyHTML = '';
+        grades.forEach(subjectGrade => {
+            let rowHTML = `<tr><td class="subject-col">${subjectGrade.subject}</td>`;
+            const semesterAverages = [];
+
+            semesters.forEach(semesterPeriods => {
+                const semesterScores = semesterPeriods.map(p => subjectGrade[p.id] || 0);
+                semesterScores.forEach(score => {
+                    rowHTML += `<td class="${score < 60 ? 'failing-score' : ''}">${score}</td>`;
+                });
+                const semesterAvg = semesterScores.length > 0 ? semesterScores.reduce((a, b) => a + b, 0) / semesterScores.length : 0;
+                semesterAverages.push(semesterAvg);
+                if (semesterPeriods.length > 0) {
+                    rowHTML += `<td class="${semesterAvg < 60 ? 'failing-score' : ''}">${semesterAvg.toFixed(2)}</td>`;
+                }
+            });
+
+            const finalAvg = semesterAverages.length > 0 ? semesterAverages.reduce((a, b) => a + b, 0) / semesterAverages.length : 0;
+            rowHTML += `<td class="${finalAvg < 60 ? 'failing-score' : ''}">${finalAvg.toFixed(2)}</td></tr>`;
+            bodyHTML += rowHTML;
+
+            if (subjectGrade.comment && subjectGrade.comment.trim() !== '') {
+                const colspan = document.querySelector('#gradeTable thead tr')?.cells.length || 1;
+                bodyHTML += `<tr class="comment-row"><td colspan="${colspan}"><span class="comment-label">Comment:</span> ${subjectGrade.comment}</td></tr>`;
+            }
+        });
+        return bodyHTML;
+    }
+
+    /**
+     * Builds the HTML for the table footer (tfoot) with period and semester averages.
+     * @param {Array<Object>} grades - The array of grade data for the student.
+     * @param {Array<Array<Object>>} semesters - An array of semester arrays.
+     * @returns {string} The inner HTML for the tfoot element.
+     */
+    function buildTableFooter(grades, semesters) {
+        let footerHTML = '<tr><th class="subject-col">Average</th>';
+        const overallSemesterAverages = [];
+
+        semesters.forEach(semesterPeriods => {
+            const periodAverages = [];
+            semesterPeriods.forEach(p => {
+                const periodTotal = grades.reduce((sum, current) => sum + (current[p.id] || 0), 0);
+                const avg = grades.length > 0 ? periodTotal / grades.length : 0;
+                footerHTML += `<td class="${avg < 60 ? 'failing-score' : ''}">${avg.toFixed(2)}</td>`;
+                periodAverages.push(avg);
+            });
+
+            const overallSemesterAvg = periodAverages.length > 0 ? periodAverages.reduce((a, b) => a + b, 0) / periodAverages.length : 0;
+            overallSemesterAverages.push(overallSemesterAvg);
+            if (semesterPeriods.length > 0) {
+                footerHTML += `<td class="${overallSemesterAvg < 60 ? 'failing-score' : ''}">${overallSemesterAvg.toFixed(2)}</td>`;
+            }
+        });
+
+        const finalOverallAvg = overallSemesterAverages.length > 0 ? overallSemesterAverages.reduce((a, b) => a + b, 0) / overallSemesterAverages.length : 0;
+        footerHTML += `<td class="${finalOverallAvg < 60 ? 'failing-score' : ''}">${finalOverallAvg.toFixed(2)}</td></tr>`;
+        
+        // Set Overall Performance Comment based on this final average
+        setOverallPerformance(finalOverallAvg);
+
+        return footerHTML;
+    }
+
+    // --- Report Card Display Logic ---
+    function displayReportCard(studentData, studentId) {
+        document.getElementById('student-info-name').textContent = studentData.name;
+        document.getElementById('student-info-id').textContent = studentId;
+
+        const grades = studentData.grades;
+        const tableHead = document.querySelector('#gradeTable thead');
+        const tableBody = document.getElementById('grades-body');
+        const tableFoot = document.querySelector('#gradeTable tfoot');
+
+        if (!grades || grades.length === 0) {
+            tableHead.innerHTML = '';
+            tableFoot.innerHTML = '';
+            tableBody.innerHTML = '<tr><td colspan="100%">No grades found.</td></tr>';
+            return;
+        }
+
+        // 1. Dynamically determine active periods and their names from the data
+        const activePeriods = [];
+        const firstSubject = grades[0];
+        for (const key in firstSubject) {
+            if (key !== 'subject' && key !== 'comment') {
+                const isExam = key.startsWith('exam');
+                const num = parseInt(key.replace(/\D/g, '')) || '';
+                const name = isExam ? `Exam ${num}` : `${num}${getOrdinalSuffix(num)} Period`;
+                activePeriods.push({ id: key, name: name, type: isExam ? 'exam' : 'period' });
+            }
+        }
+
+        // 2. Group periods into semesters
+        const semesters = groupPeriodsIntoSemesters(activePeriods);
+
+        // 3. Build and render all parts of the table
+        tableHead.innerHTML = buildTableHeader(semesters);
+        tableBody.innerHTML = buildTableBody(grades, semesters);
+        tableFoot.innerHTML = buildTableFooter(grades, semesters);
+
+        // 4. Set the print date
+        const today = new Date();
+        document.getElementById('report-date').textContent = today.toLocaleDateString();
+    }
+
+    function setOverallPerformance(finalAvg) {
+        const gradeSpan = document.getElementById('overall-grade');
+        const commentP = document.getElementById('overall-comment');
+        let grade = '';
+        let comment = '';
+
+        if (finalAvg >= 90) {
+            grade = 'A';
+            comment = 'Excellent work! Keep up the outstanding performance.';
+        } else if (finalAvg >= 80) {
+            grade = 'B';
+            comment = 'Great job! Consistently strong performance.';
+        } else if (finalAvg >= 70) {
+            grade = 'C';
+            comment = 'Good effort. Continue to work hard.';
+        } else if (finalAvg >= 60) {
+            grade = 'D';
+            comment = 'Satisfactory. There is room for improvement.';
+        } else {
+            grade = 'F';
+            comment = 'Needs improvement. Please see the administration for guidance.';
+        }
+
+        gradeSpan.textContent = grade;
+        commentP.textContent = comment;
+    }
+
+    function getOrdinalSuffix(i) {
+        if (!i) return "";
+        const j = i % 10,
+            k = i % 100;
+        if (j === 1 && k !== 11) return "st";
+        if (j === 2 && k !== 12) return "nd";
+        if (j === 3 && k !== 13) return "rd";
+        return "th";
+    }
+});

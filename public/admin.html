@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin: Add Student Report Card</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="section active">
+            <h1>Admin: Add Student Report Card</h1>
+            <p>Add a new student's grades to the database.</p>
+            
+            <!-- Navigation Link -->
+            <div style="text-align: left; margin-bottom: 20px;">
+                <a href="index.html" style="color: #3498db; text-decoration: none;">← Back to Student Portal</a>
+            </div>
+
+            <!-- Edit Student Section -->
+            <div class="edit-section">
+                <h2>Edit Existing Student</h2>
+                <div class="form-group">
+                    <label for="edit-student-id">Enter Student ID to Load:</label>
+                    <input type="text" id="edit-student-id" placeholder="e.g., 202412345">
+                    <button type="button" id="load-student-btn" style="margin-top: 10px;">Load Student</button>
+                </div>
+            </div>
+
+            <form id="admin-form">
+                <div class="form-group">
+                    <label for="student-name">Student's Full Name:</label>
+                    <input type="text" id="student-name" placeholder="e.g., New Student" required>
+                </div>
+                <div class="form-group">
+                    <label for="student-id">Student ID:</label>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <input type="text" id="student-id" placeholder="e.g., 202499999" required style="flex-grow: 1;">
+                        <button type="button" id="generate-id-btn">Generate ID</button>
+                    </div>
+                </div>
+
+                <!-- Section for managing subject names -->
+                <div id="subjects-management-section">
+                    <h3>Subjects</h3>
+                    <div id="subject-names-container">
+                        <!-- Subject name inputs will be dynamically generated here -->
+                    </div>
+                    <button type="button" id="add-subject-btn" style="margin-bottom: 20px;">Add Subject</button>
+                </div>
+
+                <!-- Section for managing periods -->
+                <div id="periods-management-section">
+                    <h3>Periods</h3>
+                    <div id="active-periods-container" style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
+                        <!-- Active periods will be dynamically generated here -->
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="new-period-name-input" placeholder="e.g., Midterm Exam" style="flex-grow: 1;">
+                        <button type="button" id="add-regular-period-btn">Add Regular Period</button>
+                        <button type="button" id="add-exam-period-btn">Add Exam Period</button>
+                    </div>
+                </div>
+
+
+                <!-- Section for entering grades period by period -->
+                <div id="grades-by-period-section">
+                    <!-- Period sections will be dynamically generated here -->
+                </div>
+
+                <!-- Real-time Averages Table -->
+                <div class="overall-averages">
+                    <h3>Overall Averages</h3> 
+                    <div id="overall-averages-display" class="score-row">
+                        <!-- Dynamic average boxes will be rendered here -->
+                    </div> 
+                    <div class="final-average-summary">
+                        <span>Semester 1 Avg: <strong id="avg-sem1">0.00</strong></span>
+                        <span>Semester 2 Avg: <strong id="avg-sem2">0.00</strong></span>
+                        <span>Final Overall Avg: <strong id="avg-final">0.00</strong></span>
+                    </div>
+                </div>
+
+                <button type="submit" id="submit-btn">Add Student to Database</button>
+                <button type="button" id="cancel-edit-btn" class="btn-secondary hidden" style="margin-left: 10px;">Cancel Edit</button>
+                <button type="button" id="delete-student-btn" class="btn-danger hidden" style="margin-left: 10px;">Delete Student</button>
+            </form>
+            <p id="admin-message" class="error hidden"></p>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>
