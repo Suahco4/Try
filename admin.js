@@ -147,7 +147,7 @@ function calculateAndDisplayAverages() {
 }
 
 // --- API Communication Layer ---
-const API_BASE_URL = 'https://backend-wf9k.onrender.com';
+const API_BASE_URL = 'https://your-render-app-name.onrender.com';
 const adminForm = document.getElementById('admin-form');
 const adminMessage = document.getElementById('admin-message');
 
