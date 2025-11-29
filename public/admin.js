@@ -147,7 +147,7 @@ function calculateAndDisplayAverages() {
 }
 
 // --- API Communication Layer ---
-const API_BASE_URL = 'https://backend-wf9k.onrender.com';
+const API_BASE_URL = 'https://online-report-card-frontend.onrender.com';
 const adminForm = document.getElementById('admin-form');
 const adminMessage = document.getElementById('admin-message');
 
@@ -506,4 +506,5 @@ document.addEventListener('DOMContentLoaded', function() {
     activePeriods = getDefaultPeriods();
     renderFormFromData(); // Initial render with one blank subject
     calculateAndDisplayAverages();
+
 });
