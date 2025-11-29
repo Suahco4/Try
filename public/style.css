@@ -356,3 +356,12 @@ button:hover {
         display: flex; /* Show the signature section when printing */
     }
 }
+
+.highest-score {
+    background-color: #d4edda; /* Light green */
+    font-weight: bold;
+}
+
+.lowest-score {
+    background-color: #f8d7da; /* Light red */
+}

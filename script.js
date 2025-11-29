@@ -93,10 +93,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentSemester = [];
             }
         }
-        // Add any remaining periods if they don't end with an exam
-        if (currentSemester.length > 0) {
+        // If there are periods left that didn't form a semester (e.g., no exams),
+        // or if there were no periods to begin with, treat the remaining as a single semester.
+        if (currentSemester.length > 0 || activePeriods.length === 0) {
             semesters.push(currentSemester);
         }
+        
         return semesters.length > 0 ? semesters : [activePeriods];
     }
 
@@ -127,11 +129,25 @@ document.addEventListener('DOMContentLoaded', () => {
             let rowHTML = `<tr><td class="subject-col">${subjectGrade.subject}</td>`;
             const semesterAverages = [];
 
+        // Find highest and lowest scores for the current subject across all periods
+        const allScores = semesters.flat().map(p => subjectGrade[p.id]).filter(score => typeof score === 'number');
+        let minScore = -1, maxScore = -1;
+        if (allScores.length > 1) { // Only highlight if there's more than one grade to compare
+            minScore = Math.min(...allScores);
+            maxScore = Math.max(...allScores);
+        }
+
             semesters.forEach(semesterPeriods => {
                 const semesterScores = semesterPeriods.map(p => subjectGrade[p.id] || 0);
                 semesterScores.forEach(score => {
-                    rowHTML += `<td class="${score < 60 ? 'failing-score' : ''}">${score}</td>`;
+                let classList = '';
+                if (score < 60) classList += 'failing-score';
+                if (score === maxScore && maxScore !== minScore) classList += ' highest-score';
+                if (score === minScore && maxScore !== minScore) classList += ' lowest-score';
+
+                rowHTML += `<td class="${classList.trim()}">${score}</td>`;
                 });
+
                 const semesterAvg = semesterScores.length > 0 ? semesterScores.reduce((a, b) => a + b, 0) / semesterScores.length : 0;
                 semesterAverages.push(semesterAvg);
                 if (semesterPeriods.length > 0) {
@@ -178,7 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         const finalOverallAvg = overallSemesterAverages.length > 0 ? overallSemesterAverages.reduce((a, b) => a + b, 0) / overallSemesterAverages.length : 0;
-        footerHTML += `<td class="${finalOverallAvg < 60 ? 'failing-score' : ''}">${finalOverallAvg.toFixed(2)}</td></tr>`;
+        footerHTML += `<td class="${finalOverallAvg < 60 ? 'failing-score' : ''}">${finalOverallAvg.toFixed(2)}</td>`;
         
         // Set Overall Performance Comment based on this final average
         setOverallPerformance(finalOverallAvg);

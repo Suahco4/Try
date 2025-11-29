@@ -32,7 +32,7 @@
             <h1 id="report-title">Progress Report</h1>
             <div class="student-info">
                 <h2 id="student-info-name"></h2>
-                <p>ID: <span id="student-info-id"></span></p>
+                <p>ID: <a href="#" id="student-id-link" title="Student ID" aria-label="Student ID"><span id="student-info-id"></span></a></p>
             </div>
             <table id="gradeTable" class="grades-table">
                 <thead>
@@ -42,7 +42,12 @@
                     <!-- Grades populated by JS -->
                 </tbody>
                 <tfoot>
-                    <!-- Table Footer will be populated by JS -->
+                    <tr class="average-row" id="sem1-average-row">
+                        <!-- Populated by JS -->
+                    </tr>
+                    <tr class="average-row" id="sem2-average-row">
+                        <!-- Populated by JS -->
+                    </tr>
                 </tfoot>
             </table>
             <div class="overall">

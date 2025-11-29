@@ -492,7 +492,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (gradesData.length > 0) {
             const firstSubjectGrades = gradesData[0];
             for (const key in firstSubjectGrades) {
-                if (key !== 'subject' && key !== 'comment') {
+                if (key !== 'subject' && key !== 'comment' && key !== '_id' && key !== '__v') {
                     const type = key.startsWith('exam') ? 'exam' : 'period';
                     const name = key.startsWith('p') ? `${parseInt(key.substring(1))}${getOrdinalSuffix(parseInt(key.substring(1)))} Period` : (key.startsWith('exam') ? `Exam ${parseInt(key.substring(4))}` : key);
                     activePeriods.push({ id: key, name: name, type: type });
@@ -506,5 +506,4 @@ document.addEventListener('DOMContentLoaded', function() {
     activePeriods = getDefaultPeriods();
     renderFormFromData(); // Initial render with one blank subject
     calculateAndDisplayAverages();
-
 });
