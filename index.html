@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>School Report Card Portal</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Link to Google Fonts for a cleaner typeface -->
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
@@ -14,12 +16,12 @@
             <p>Enter your student's name and ID to view the progress report.</p>
             <form id="login-form">
                 <div class="form-group">
-                    <label for="student-name">Student's Full Name:</label>
-                    <input type="text" id="student-name" placeholder="e.g., John Doe" required>
+                    <label for="login-student-name">Student's Full Name:</label>
+                    <input type="text" id="login-student-name" placeholder="e.g., John Doe" required>
                 </div>
                 <div class="form-group">
-                    <label for="student-id">Student ID:</label>
-                    <input type="text" id="student-id" placeholder="e.g., 12345" required>
+                    <label for="login-student-id">Student ID:</label>
+                    <input type="text" id="login-student-id" placeholder="e.g., 12345" required>
                 </div>
                 <button type="submit">View Report Card</button>
             </form>
@@ -28,11 +30,16 @@
 
         <!-- Report Card Section (Hidden until login) -->
         <div id="report-section" class="section hidden">
-            <img id="school-logo" src="path/to/your/school_logo.png" alt="School Logo">
+            <div class="report-header">
+                <div class="school-details">
+                    <h2 id="report-school-name" class="school-name"></h2>
+                    <p id="report-school-address" class="school-address"></p>
+                </div>
+            </div>
             <h1 id="report-title">Progress Report</h1>
             <div class="student-info">
                 <h2 id="student-info-name"></h2>
-                <p>ID: <a href="#" id="student-id-link" title="Student ID" aria-label="Student ID"><span id="student-info-id"></span></a></p>
+                <p>Student ID: <span id="student-info-id"></span></p>
             </div>
             <table id="gradeTable" class="grades-table">
                 <thead>

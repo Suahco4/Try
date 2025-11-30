@@ -21,6 +21,8 @@ const gradeSchema = new mongoose.Schema({}, {
 const studentSchema = new mongoose.Schema({
   _id: { type: String, required: true }, // Use the student ID as the primary key
   name: { type: String, required: true },
+  schoolName: { type: String, required: false },
+  schoolAddress: { type: String, required: false },
   grades: [gradeSchema]
 }, {
   // Use the provided _id instead of letting MongoDB generate one
@@ -38,6 +40,7 @@ app.use(cors());
 
 // Serve static files (like index.html, style.css, script.js) from the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
+
 
 // Add middleware to parse JSON bodies from incoming requests
 app.use(express.json());
@@ -58,13 +61,14 @@ app.get('/api/students/:id', async (req, res) => {
 // API endpoint to CREATE a new student
 app.post('/api/students', async (req, res) => {
   try {
-    const { id, name, grades } = req.body;
+    const { id, name, schoolName, schoolAddress, grades } = req.body;
+
     // Check if a student with this ID already exists
     const existingStudent = await Student.findById(id);
     if (existingStudent) {
       return res.status(409).json({ success: false, message: 'A student with this ID already exists.' });
     }
-    const newStudent = new Student({ _id: id, name, grades });
+    const newStudent = new Student({ _id: id, name, schoolName, schoolAddress, grades });
     await newStudent.save();
     res.status(201).json({ success: true, message: 'Student added successfully!', data: newStudent });
   } catch (error) {
@@ -75,10 +79,11 @@ app.post('/api/students', async (req, res) => {
 // API endpoint to UPDATE an existing student's data
 app.put('/api/students/:id', async (req, res) => {
   try {
-    const { name, grades } = req.body;
+    const { name, schoolName, schoolAddress, grades } = req.body;
+
     const updatedStudent = await Student.findByIdAndUpdate(
       req.params.id,
-      { name, grades },
+      { name, schoolName, schoolAddress, grades },
       { new: true, runValidators: true } // Return the updated document
     );
 

@@ -1,358 +1,242 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
+/* --- General Body & Typography --- */
 body {
-    font-family: 'Arial', sans-serif;
-    background-color: #f4f4f9;
+    font-family: 'Lato', sans-serif;
+    background-color: #f4f7f6;
     color: #333;
+    margin: 0;
+    padding: 20px;
     line-height: 1.6;
 }
 
 .container {
-    max-width: 800px;
+    max-width: 900px;
     margin: 0 auto;
-    padding: 20px;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-.section {
-    background: white;
-    padding: 40px;
-    border-radius: 10px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    text-align: center;
-}
-
-.section h1 {
+h1, h2, h3 {
     color: #2c3e50;
+    margin-top: 0;
+}
+
+h1 {
+    font-size: 2em;
+    text-align: center;
     margin-bottom: 10px;
 }
 
-.section p {
-    margin-bottom: 30px;
-    color: #7f8c8d;
-}
-
-.form-group {
+p {
+    color: #555;
     margin-bottom: 20px;
-    text-align: left;
+    text-align: center;
 }
 
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-}
-
-.form-group input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 16px;
-}
-
-button {
-    background: #3498db;
-    color: white;
-    padding: 12px 30px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background 0.3s;
-}
-
-button:hover {
-    background: #2980b9;
-}
-
-.btn-secondary {
-    background: #95a5a6;
-}
-
-.btn-secondary:hover {
-    background: #7f8c8d;
-}
-
-.error {
-    color: #e74c3c;
-    margin-top: 10px;
-}
-
+/* --- Utility Classes --- */
 .hidden {
-    display: none !important;
+    display: none;
 }
 
 .active {
     display: block;
 }
 
-.student-info {
-    background: #ecf0f1;
-    padding: 20px;
-    border-radius: 5px;
-    margin: 20px 0;
+/* --- Form Styling (Login & Admin) --- */
+.form-group {
+    margin-bottom: 20px;
 }
 
-.student-info h2 {
-    color: #2c3e50;
-}
-
-.grades-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 20px 0;
-}
-
-.grades-table th,
-.grades-table td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-}
-
-.grades-table th {
-    background: #34495e;
-    color: white;
-}
-
-.grades-table tr:hover {
-    background: #f8f9fa;
-}
-
-.overall {
-    background: #d5f4e6;
-    padding: 20px;
-    border-radius: 5px;
-    margin: 20px 0;
-}
-
-@media (max-width: 600px) {
-    .container {
-        padding: 10px;
-    }
-    
-    .section {
-        padding: 20px;
-    }
-    
-    .grades-table {
-        font-size: 14px;
-    }
-}
-
-/* NEW: Enhanced table styling */
-.grades-table tfoot {
+.form-group label {
+    display: block;
     font-weight: bold;
-    background: #f8f9fa;
-}
-
-.grades-table th, .grades-table td {
-    min-width: 60px;  /* Prevent squishing */
-}
-
-.sem-avg-th {
-    background: #e8f4fd;  /* Light blue for semester avgs */
-}
-
-.final-avg {
-    font-weight: bold;
-    color: #27ae60;  /* Green for final avgs */
-}
-
-@media (max-width: 768px) {
-    .grades-table {
-        font-size: 12px;
-    }
-    .grades-table th, .grades-table td {
-        padding: 8px;
-        min-width: 40px;
-    }
-}
-/* Admin-Specific Styles */
-.subject-group {
-    background: #f8f9fa;
-    padding: 15px;
-    border-radius: 5px;
-    margin: 15px 0;
-}
-
-.subject-group h4 {
-    color: #2c3e50;
-    margin-bottom: 10px;
-}
-
-.score-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-    gap: 10px;
-}
-
-.form-group.small {
-    margin-bottom: 5px;
-}
-
-.form-group.small input {
-    font-size: 14px;
-    padding: 5px;
-}
-
-.success {
-    color: #27ae60 !important;  /* Green for success messages */
-}
-
-/* Hide/show for extra subjects */
-.subject-group.hidden {
-    display: none;
-}
-
-/* Styles for Real-time Averages Box */
-.overall-averages {
-    background: #ecf0f1;
-    border: 1px solid #bdc3c7;
-    padding: 15px;
-    margin: 20px 0;
-    border-radius: 5px;
-}
-
-.overall-averages h3 {
-    text-align: center;
-    color: #2c3e50;
-    margin-bottom: 15px;
-}
-
-.avg-box {
-    background: white;
-    padding: 8px;
-    border-radius: 4px;
-    text-align: center;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-}
-.avg-box span { display: block; font-size: 12px; color: #7f8c8d; }
-.avg-box strong { display: block; font-size: 18px; color: #2c3e50; }
-
-.final-average-summary {
-    text-align: center;
-    margin-top: 15px;
-    display: flex;
-    justify-content: space-around;
-    font-weight: bold;
+    margin-bottom: 8px;
     color: #34495e;
 }
 
-/* Utility class for highlighting failing scores */
-.failing-score {
-    color: #e74c3c !important; /* A strong red color */
+input[type="text"],
+input[type="number"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 1em;
 }
 
-/* Styling for subject-specific comments */
-.comment-row td {
-    padding: 8px 15px;
-    background-color: #f8f9fa;
-    font-style: italic;
-    color: #555;
-    border-bottom: 1px solid #ddd;
-}
-
-.comment-label {
+button, .btn-secondary, .btn-danger {
+    display: inline-block;
+    width: 100%;
+    padding: 12px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1.1em;
     font-weight: bold;
-    font-style: normal;
-    color: #333;
+    transition: background-color 0.3s ease;
 }
 
-/* Give the subject column a bit more width */
-.subject-col {
-    width: 20%;
-    min-width: 150px;
-    text-align: left !important;
+button:hover {
+    background-color: #2980b9;
 }
 
-/* --- Print-Specific Styles --- */
-
-/* This block is only applied when printing */
-@media print {
-    /* Hide all elements on the page by default */
-    body * {
-        visibility: hidden;
-    }
-
-    /* Make the report card section and all its children visible */
-    #report-section, #report-section * {
-        visibility: visible;
-    }
-
-    /* Position the report card at the top-left of the print page */
-    #report-section {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        box-shadow: none; /* Remove screen shadow for printing */
-        padding: 0;
-    }
-
-    /* Hide the buttons that are not needed for printing */
-    .report-actions {
-        display: none;
-    }
-
-    /* Ensure table colors print (optional, browser-dependent) */
-    .grades-table thead tr {
-        background-color: #009879 !important;
-        -webkit-print-color-adjust: exact; /* For Chrome/Safari */
-        print-color-adjust: exact; /* Standard */
-    }
+.btn-secondary {
+    background-color: #7f8c8d;
+    margin-top: 10px;
+}
+.btn-secondary:hover {
+    background-color: #6c7a7b;
 }
 
-/* School Logo Styling */
+.btn-danger {
+    background-color: #e74c3c;
+    margin-top: 10px;
+}
+.btn-danger:hover {
+    background-color: #c0392b;
+}
+
+.error {
+    color: #e74c3c;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 15px;
+}
+
+/* --- Report Card Specific Styling --- */
+.report-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
 #school-logo {
-    display: none; /* Hidden by default on screen */
-    max-width: 150px; /* Adjust as needed */
-    margin: 0 auto 20px auto; /* Center and add space below */
+    max-width: 100px;
+    max-height: 100px;
 }
 
-@media print {
-    #school-logo {
-        display: block; /* Show logo when printing */
-    }
-}
-
-/* --- Signature Section Styling --- */
-.signature-section {
-    display: none; /* Hidden by default on screen */
-    justify-content: space-between;
-    margin-top: 80px; /* More space above the signature lines */
-    padding: 0 20px; /* Add some padding on the sides */
-}
-
-.signature-box {
-    width: 40%;
+.school-details {
     text-align: center;
 }
 
-.signature-box p {
-    font-size: 14px;
-    color: #333;
-    margin-top: 5px;
-    margin-bottom: 0; /* Override default paragraph margin */
+.school-name {
+    margin: 0;
+    font-size: 1.8em;
+    color: #2c3e50;
+}
+
+.school-address {
+    margin: 0;
+    font-size: 0.9em;
+    color: #7f8c8d;
+}
+
+#report-title {
+    color: #3498db;
+}
+
+.student-info {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.student-info h2 {
+    margin: 0;
+}
+
+.student-info p {
+    margin: 5px 0 0;
+    font-size: 1.1em;
+}
+
+/* --- Grades Table --- */
+.grades-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+}
+
+.grades-table th, .grades-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+}
+
+.grades-table thead {
+    background-color: #34495e;
+    color: white;
+}
+
+.grades-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.grades-table tfoot .average-row td {
+    font-weight: bold;
+    background-color: #ecf0f1;
+}
+
+.average-label {
+    text-align: right !important;
+}
+
+.failing-score {
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+/* --- Overall & Signature Sections --- */
+.overall {
+    text-align: center;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    margin-bottom: 30px;
+}
+
+.signature-section {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 50px;
+    padding-top: 30px;
+    border-top: 1px solid #eee;
+}
+
+.signature-box {
+    text-align: center;
+    width: 40%;
 }
 
 .signature-line, .date-line {
     display: block;
-    border-top: 1px solid #333;
-    padding-top: 5px;
+    border-bottom: 1px solid #333;
+    margin-bottom: 8px;
+    height: 30px;
 }
 
+/* --- Print Styles --- */
 @media print {
-    .signature-section {
-        display: flex; /* Show the signature section when printing */
+    body {
+        background-color: #fff;
+        padding: 0;
+    }
+    .container {
+        box-shadow: none;
+        padding: 0;
+        max-width: 100%;
+    }
+    .report-actions, #login-section {
+        display: none;
+    }
+    #report-section {
+        display: block !important;
     }
 }

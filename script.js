@@ -4,8 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const reportSection = document.getElementById('report-section');
     const loginForm = document.getElementById('login-form');
     const errorMessage = document.getElementById('error-message');
-    const studentNameInput = document.getElementById('student-name');
-    const studentIdInput = document.getElementById('student-id');
+    const studentNameInput = document.getElementById('login-student-name');
+    const studentIdInput = document.getElementById('login-student-id');
     const logoutBtn = document.getElementById('logout-btn');
     const printBtn = document.getElementById('print-btn');
 
@@ -61,6 +61,8 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     function displayReportCard(student) {
         // Populate student info
+        document.getElementById('report-school-name').textContent = student.schoolName || 'School Name Not Provided';
+        document.getElementById('report-school-address').textContent = student.schoolAddress || '';
         document.getElementById('student-info-name').textContent = student.name;
         document.getElementById('student-info-id').textContent = student.id;
         document.getElementById('report-date').textContent = new Date().toLocaleDateString();
@@ -96,9 +98,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // --- Determine periods from the first subject ---
         const firstGrade = grades[0];
-        const periods = Object.keys(firstGrade).filter(key => key !== 'subject' && key !== 'comment');
-        const sem1Periods = periods.filter(p => p.startsWith('p1') || p.startsWith('p2') || p.startsWith('p3') || p.startsWith('exam1'));
-        const sem2Periods = periods.filter(p => p.startsWith('p4') || p.startsWith('p5') || p.startsWith('p6') || p.startsWith('exam2'));
+        const periods = Object.keys(firstGrade).filter(key => key !== 'subject');
+        const sem1Periods = periods.filter(p => ['p1', 'p2', 'p3', 'exam1'].includes(p));
+        const sem2Periods = periods.filter(p => ['p4', 'p5', 'p6', 'exam2'].includes(p));
 
         // --- Build Table Header ---
         let headerHTML = '<tr><th>Subject</th>';
@@ -106,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const periodName = p.startsWith('p') ? `Period ${p.substring(1)}` : `Exam ${p.substring(4)}`;
             headerHTML += `<th>${periodName}</th>`;
         });
-        headerHTML += '<th>Comments</th></tr>';
+        headerHTML += '</tr>';
         tableHead.innerHTML = headerHTML;
 
         // --- Build Table Body ---
@@ -132,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     semesterCounts.sem2++;
                 }
             });
-            rowHTML += `<td>${grade.comment || ''}</td></tr>`;
+            rowHTML += `</tr>`;
             tableBody.innerHTML += rowHTML;
         });
 
@@ -144,7 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Semester 1 Average Row
         if (sem1Periods.length > 0) {
             sem1Row.innerHTML = `
-                <td colspan="${periods.length + 1}" class="average-label">Semester 1 Average</td>
+                <td colspan="${periods.length}" class="average-label">Semester 1 Average</td>
                 <td class="${sem1Avg < 60 ? 'failing-score' : ''}">${sem1Avg.toFixed(2)}</td>
             `;
         }
@@ -152,7 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Semester 2 Average Row
         if (sem2Periods.length > 0) {
             sem2Row.innerHTML = `
-                <td colspan="${periods.length + 1}" class="average-label">Semester 2 Average</td>
+                <td colspan="${periods.length}" class="average-label">Semester 2 Average</td>
                 <td class="${sem2Avg < 60 ? 'failing-score' : ''}">${sem2Avg.toFixed(2)}</td>
             `;
         }

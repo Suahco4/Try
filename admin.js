@@ -23,12 +23,11 @@ function collectCurrentGrades() {
     subjectNameGroups.forEach((subjectGroup, subjectIndex) => {
         const subjectId = subjectIndex + 1;
         const subjectNameInput = subjectGroup.querySelector(`#sub${subjectId}-name`);
-        const subjectCommentInput = subjectGroup.querySelector(`#sub${subjectId}-comment`);
-        if (subjectNameInput && subjectCommentInput) {
-            const grade = { subject: subjectNameInput.value.trim(), comment: subjectCommentInput.value.trim() };
+        if (subjectNameInput) {
+            const grade = { subject: subjectNameInput.value.trim() };
             activePeriods.forEach(period => {
                 const input = document.getElementById(`sub${subjectId}-${period.id}`);
-                grade[period.id] = parseFloat(input?.value) || 0;
+                grade[period.id] = parseFloat(input?.value) || 90;
             });
             currentGrades.push(grade);
         }
@@ -128,8 +127,8 @@ function calculateAndDisplayAverages() {
     });
 
     // Calculate Semester 1 and Semester 2 averages based on available periods
-    const sem1Periods = activePeriods.filter(p => p.id === 'p1' || p.id === 'p2' || p.id === 'p3' || p.id === 'exam1');
-    const sem2Periods = activePeriods.filter(p => p.id === 'p4' || p.id === 'p5' || p.id === 'p6' || p.id === 'exam2');
+    const sem1Periods = activePeriods.filter(p => ['p1', 'p2', 'p3', 'exam1'].includes(p.id));
+    const sem2Periods = activePeriods.filter(p => ['p4', 'p5', 'p6', 'exam2'].includes(p.id));
     const sumSem1 = sem1Periods.reduce((sum, p) => sum + (totals[p.id] || 0), 0);
     const sumSem2 = sem2Periods.reduce((sum, p) => sum + (totals[p.id] || 0), 0);
     const sem1Avg = (sem1Periods.length > 0) ? (sumSem1 / numSubjects / sem1Periods.length) : 0;
@@ -161,11 +160,11 @@ async function getStudent(id) {
 }
 
 // Function to Add a NEW Report Card via API
-async function addReportCard(name, id, grades) {
+async function addReportCard(studentData) {
     const response = await fetch(`${API_BASE_URL}/api/students`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, name, grades }),
+        body: JSON.stringify(studentData),
     });
     const result = await response.json(); // Contains { success, message } from server
     if (!response.ok) throw new Error(result.message || 'Failed to add student.');
@@ -173,11 +172,11 @@ async function addReportCard(name, id, grades) {
 }
 
 // Function to Update an EXISTING Report Card via API
-async function updateReportCard(name, id, grades) {
+async function updateReportCard(id, studentData) {
     const response = await fetch(`${API_BASE_URL}/api/students/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, grades }),
+        body: JSON.stringify(studentData),
     });
     const result = await response.json();
     if (!response.ok) throw new Error(result.message || 'Failed to update student.');
@@ -199,9 +198,11 @@ adminForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const name = document.getElementById('student-name').value.trim();
     const id = document.getElementById('student-id').value.trim();
+    const schoolName = document.getElementById('school-name').value.trim();
+    const schoolAddress = document.getElementById('school-address').value.trim();
     
-    if (!name || !id) {
-        showMessage('Please enter name and ID.', false);
+    if (!name || !id || !schoolName) {
+        showMessage('Please enter School Name, Student Name, and ID.', false);
         return;
     }
     
@@ -216,13 +217,11 @@ adminForm.addEventListener('submit', async (e) => {
     subjectNameGroups.forEach((subjectGroup, subjectIndex) => {
         const subjectId = subjectIndex + 1;
         const subjectNameInput = subjectGroup.querySelector(`#sub${subjectId}-name`);
-        const subjectCommentInput = subjectGroup.querySelector(`#sub${subjectId}-comment`);
         
         // Ensure the subject name input exists and has a value before processing.
         if (subjectNameInput && subjectNameInput.value.trim() !== '') {
             const grade = {
-                subject: subjectNameInput.value.trim(),
-                comment: subjectCommentInput ? subjectCommentInput.value.trim() : ''
+                subject: subjectNameInput.value.trim()
             };
 
             // Collect the grades for each active period for this subject
@@ -241,13 +240,21 @@ adminForm.addEventListener('submit', async (e) => {
         return;
     }
     
+    const studentData = {
+        id,
+        name,
+        schoolName,
+        schoolAddress,
+        grades
+    };
+    
     let result;
     try {
         // Check if we are in "Edit Mode" (the ID input will be read-only)
         if (document.getElementById('student-id').readOnly) {
-            result = await updateReportCard(name, id, grades);
+            result = await updateReportCard(id, studentData);
         } else {
-            result = await addReportCard(name, id, grades);
+            result = await addReportCard(studentData);
         }
         
         showMessage(result.message, result.success);
@@ -289,6 +296,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- Element Cache ---
     const generateIdBtn = document.getElementById('generate-id-btn');
     const studentIdInput = document.getElementById('student-id');
+    const schoolNameInput = document.getElementById('school-name');
+    const schoolAddressInput = document.getElementById('school-address');
     const studentNameInput = document.getElementById('student-name');
     const editIdInput = document.getElementById('edit-student-id');
     const loadStudentBtn = document.getElementById('load-student-btn');
@@ -319,6 +328,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         try {
             const studentData = await getStudent(studentIdToLoad);
+            schoolNameInput.value = studentData.schoolName || '';
+            schoolAddressInput.value = studentData.schoolAddress || '';
             studentNameInput.value = studentData.name;
             studentIdInput.value = studentIdToLoad;
             studentIdInput.readOnly = true;
@@ -392,8 +403,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (e.target.classList.contains('remove-subject-btn')) {
             const subjectGroup = e.target.closest('.subject-name-group');
             if (subjectGroup) {
-                subjectGroup.nextElementSibling.remove(); // Remove comment associated with subject
-                subjectGroup.remove(); // Remove subject name group
+                subjectGroup.remove();
                 reindexSubjectNames();
                 renderAllDynamicSections();
             }
@@ -417,9 +427,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function addSubjectInput(subjectData = {}, index) {
-        subjectCounter = subjectNamesContainer.children.length / 2 + 1; // Each subject has 2 divs
+        subjectCounter = subjectNamesContainer.children.length + 1;
         const subjectIndex = index || subjectCounter;
-        const { subject: name = '', comment = '' } = subjectData;
+        const { subject: name = '' } = subjectData;
         const removeButtonHTML = subjectIndex > 1 ? `<button type="button" class="remove-subject-btn" data-index="${subjectIndex}">Remove</button>` : '';
         const subjectInputHTML = `
             <div class="form-group subject-name-group" data-index="${subjectIndex}">
@@ -427,11 +437,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <input type="text" id="sub${subjectIndex}-name" placeholder="e.g., History" value="${name}" required>
                     ${removeButtonHTML}
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="sub${subjectIndex}-comment">Comment:</label>
-                <textarea id="sub${subjectIndex}-comment" rows="2" placeholder="Enter comments for this subject...">${comment}</textarea>
             </div>`;
         subjectNamesContainer.insertAdjacentHTML('beforeend', subjectInputHTML);
     }
@@ -478,10 +483,6 @@ document.addEventListener('DOMContentLoaded', function() {
             label.textContent = `Subject ${newIndex} Name:`;
             label.setAttribute('for', `sub${newIndex}-name`);
             group.querySelector('input').id = `sub${newIndex}-name`;
-            const commentGroup = group.nextElementSibling;
-            const commentLabel = commentGroup.querySelector('label');
-            commentLabel.setAttribute('for', `sub${newIndex}-comment`);
-            commentGroup.querySelector('textarea').id = `sub${newIndex}-comment`;
             const removeBtn = group.querySelector('.remove-subject-btn');
             if (removeBtn) removeBtn.dataset.index = newIndex;
         });
@@ -492,7 +493,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (gradesData.length > 0) {
             const firstSubjectGrades = gradesData[0];
             for (const key in firstSubjectGrades) {
-                if (key !== 'subject' && key !== 'comment') {
+                if (key !== 'subject') {
                     const type = key.startsWith('exam') ? 'exam' : 'period';
                     const name = key.startsWith('p') ? `${parseInt(key.substring(1))}${getOrdinalSuffix(parseInt(key.substring(1)))} Period` : (key.startsWith('exam') ? `Exam ${parseInt(key.substring(4))}` : key);
                     activePeriods.push({ id: key, name: name, type: type });
