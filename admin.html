@@ -13,8 +13,8 @@
             <p>Add a new student's grades to the database.</p>
             
             <!-- Navigation Link -->
-            <div style="text-align: left; margin-bottom: 20px;">
-                <a href="index.html" style="color: #3498db; text-decoration: none;">← Back to Student Portal</a>
+            <div class="nav-back">
+                <a href="index.html" class="back-link">← Back to Student Portal</a>
             </div>
 
             <!-- Edit Student Section -->
@@ -23,7 +23,7 @@
                 <div class="form-group">
                     <label for="edit-student-id">Enter Student ID to Load:</label>
                     <input type="text" id="edit-student-id" placeholder="e.g., 202412345">
-                    <button type="button" id="load-student-btn" style="margin-top: 10px;">Load Student</button>
+                    <button type="button" id="load-student-btn">Load Student</button>
                 </div>
             </div>
 
@@ -34,8 +34,8 @@
                 </div>
                 <div class="form-group">
                     <label for="student-id">Student ID:</label>
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <input type="text" id="student-id" placeholder="e.g., 202499999" required style="flex-grow: 1;">
+                    <div class="student-id-row">
+                        <input type="text" id="student-id" placeholder="e.g., 202499999" required class="student-id-input">
                         <button type="button" id="generate-id-btn">Generate ID</button>
                     </div>
                 </div>
@@ -46,17 +46,17 @@
                     <div id="subject-names-container">
                         <!-- Subject name inputs will be dynamically generated here -->
                     </div>
-                    <button type="button" id="add-subject-btn" style="margin-bottom: 20px;">Add Subject</button>
+                    <button type="button" id="add-subject-btn">Add Subject</button>
                 </div>
 
                 <!-- Section for managing periods -->
                 <div id="periods-management-section">
                     <h3>Periods</h3>
-                    <div id="active-periods-container" style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
+                    <div id="active-periods-container">
                         <!-- Active periods will be dynamically generated here -->
                     </div>
-                    <div style="display: flex; gap: 10px;">
-                        <input type="text" id="new-period-name-input" placeholder="e.g., Midterm Exam" style="flex-grow: 1;">
+                    <div class="periods-input-row">
+                        <input type="text" id="new-period-name-input" placeholder="e.g., Midterm Exam" class="periods-input-grow">
                         <button type="button" id="add-regular-period-btn">Add Regular Period</button>
                         <button type="button" id="add-exam-period-btn">Add Exam Period</button>
                     </div>
@@ -82,8 +82,8 @@
                 </div>
 
                 <button type="submit" id="submit-btn">Add Student to Database</button>
-                <button type="button" id="cancel-edit-btn" class="btn-secondary hidden" style="margin-left: 10px;">Cancel Edit</button>
-                <button type="button" id="delete-student-btn" class="btn-danger hidden" style="margin-left: 10px;">Delete Student</button>
+                <button type="button" id="cancel-edit-btn" class="btn-secondary hidden">Cancel Edit</button>
+                <button type="button" id="delete-student-btn" class="btn-danger hidden">Delete Student</button>
             </form>
             <p id="admin-message" class="error hidden"></p>
         </div>

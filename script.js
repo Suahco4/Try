@@ -1,284 +1,205 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // --- Element Cache ---
     const loginSection = document.getElementById('login-section');
     const reportSection = document.getElementById('report-section');
     const loginForm = document.getElementById('login-form');
     const errorMessage = document.getElementById('error-message');
+    const studentNameInput = document.getElementById('student-name');
+    const studentIdInput = document.getElementById('student-id');
     const logoutBtn = document.getElementById('logout-btn');
     const printBtn = document.getElementById('print-btn');
 
-    // --- API Communication Layer ---
-    // This should be the URL of your deployed backend server (e.g., from Render).
-    // IMPORTANT: Replace this with your actual backend URL once it is deployed.
-    const API_BASE_URL = 'https://online-report-card-frontend.onrender.com'; 
+    // --- API Configuration ---
+    const API_BASE_URL = 'https://online-report-card-frontend.onrender.com';
 
-    // Function to Fetch a single student's data from the backend
-    async function getStudent(id) {
-        const response = await fetch(`${API_BASE_URL}/api/students/${id}`);
-        if (!response.ok) {
-            throw new Error('Student not found');
-        }
-        return await response.json();
-    }
+    // --- State ---
+    let currentStudentData = null;
 
-    // --- Login Logic ---
-    loginForm.addEventListener('submit', async (e) => {
+    // --- Functions ---
+
+    /**
+     * Handles the login form submission.
+     * @param {Event} e The form submission event.
+     */
+    async function handleLogin(e) {
         e.preventDefault();
-        const name = document.getElementById('student-name').value.trim();
-        const id = document.getElementById('student-id').value.trim();
+        errorMessage.classList.add('hidden');
+        const name = studentNameInput.value.trim();
+        const id = studentIdInput.value.trim();
 
-        try {
-            const studentData = await getStudent(id); // Fetch student data from the API
-            if (studentData && studentData.name.toLowerCase() === name.toLowerCase()) {
-                displayReportCard(studentData, id);
-                showSection('report');
-            } else {
-                errorMessage.classList.remove('hidden');
-            }
-        } catch (error) {
+        if (!name || !id) {
+            errorMessage.textContent = 'Please enter both name and ID.';
             errorMessage.classList.remove('hidden');
-        }
-    });
-
-    // --- Logout Logic ---
-    logoutBtn.addEventListener('click', () => {
-        loginForm.reset();
-        reportSection.classList.remove('active');
-        showSection('login');
-    });
-
-    // --- Print Logic ---
-    printBtn.addEventListener('click', () => {
-        window.print();
-    });
-
-    // Helper function to switch between login and report sections
-    function showSection(sectionName) {
-        if (sectionName === 'report') {
-            loginSection.classList.remove('active');
-            loginSection.classList.add('hidden');
-            reportSection.classList.remove('hidden');
-            reportSection.classList.add('active');
-            errorMessage.classList.add('hidden');
-        } else { // 'login'
-            reportSection.classList.remove('active');
-            reportSection.classList.add('hidden');
-            loginSection.classList.remove('hidden');
-            loginSection.classList.add('active');
-        }
-    }
-
-    // --- Report Card Display Logic ---
-
-    /**
-     * Groups periods into semesters based on the presence of exam periods.
-     * e.g., [p1, p2, exam1, p3, p4, exam2] -> [[p1, p2, exam1], [p3, p4, exam2]]
-     * @param {Array<Object>} activePeriods - Array of period objects {id, name, type}.
-     * @returns {Array<Array<Object>>} An array of semester arrays.
-     */
-    function groupPeriodsIntoSemesters(activePeriods) {
-        const semesters = [];
-        let currentSemester = [];
-        // Sort periods to ensure logical order (p1, p2, exam1, p3...)
-        activePeriods.sort((a, b) => {
-            const aNum = parseInt(a.id.replace(/\D/g, ''));
-            const bNum = parseInt(b.id.replace(/\D/g, ''));
-            if (a.type !== b.type) return a.type === 'exam' ? 1 : -1; // exams last
-            return aNum - bNum;
-        });
-
-        for (const period of activePeriods) {
-            currentSemester.push(period);
-            if (period.type === 'exam') {
-                semesters.push(currentSemester);
-                currentSemester = [];
-            }
-        }
-        // If there are periods left that didn't form a semester (e.g., no exams),
-        // or if there were no periods to begin with, treat the remaining as a single semester.
-        if (currentSemester.length > 0 || activePeriods.length === 0) {
-            semesters.push(currentSemester);
-        }
-        
-        return semesters.length > 0 ? semesters : [activePeriods];
-    }
-
-    /**
-     * Builds the HTML for the table header (thead).
-     * @param {Array<Array<Object>>} semesters - An array of semester arrays.
-     * @returns {string} The inner HTML for the thead element.
-     */
-    function buildTableHeader(semesters) {
-        let headerHTML = '<tr><th class="subject-col">Subject</th>';
-        semesters.forEach((semesterPeriods, index) => {
-            semesterPeriods.forEach(p => headerHTML += `<th>${p.name}</th>`);
-            if (semesterPeriods.length > 0) headerHTML += `<th>Sem ${index + 1} Avg</th>`;
-        });
-        headerHTML += '<th>Final Avg</th></tr>';
-        return headerHTML;
-    }
-
-    /**
-     * Builds the HTML for the table body (tbody) with all subjects and their grades.
-     * @param {Array<Object>} grades - The array of grade data for the student.
-     * @param {Array<Array<Object>>} semesters - An array of semester arrays.
-     * @returns {string} The inner HTML for the tbody element.
-     */
-    function buildTableBody(grades, semesters) {
-        let bodyHTML = '';
-        grades.forEach(subjectGrade => {
-            let rowHTML = `<tr><td class="subject-col">${subjectGrade.subject}</td>`;
-            const semesterAverages = [];
-
-        // Find highest and lowest scores for the current subject across all periods
-        const allScores = semesters.flat().map(p => subjectGrade[p.id]).filter(score => typeof score === 'number');
-        let minScore = -1, maxScore = -1;
-        if (allScores.length > 1) { // Only highlight if there's more than one grade to compare
-            minScore = Math.min(...allScores);
-            maxScore = Math.max(...allScores);
-        }
-
-            semesters.forEach(semesterPeriods => {
-                const semesterScores = semesterPeriods.map(p => subjectGrade[p.id] || 0);
-                semesterScores.forEach(score => {
-                let classList = '';
-                if (score < 60) classList += 'failing-score';
-                if (score === maxScore && maxScore !== minScore) classList += ' highest-score';
-                if (score === minScore && maxScore !== minScore) classList += ' lowest-score';
-
-                rowHTML += `<td class="${classList.trim()}">${score}</td>`;
-                });
-
-                const semesterAvg = semesterScores.length > 0 ? semesterScores.reduce((a, b) => a + b, 0) / semesterScores.length : 0;
-                semesterAverages.push(semesterAvg);
-                if (semesterPeriods.length > 0) {
-                    rowHTML += `<td class="${semesterAvg < 60 ? 'failing-score' : ''}">${semesterAvg.toFixed(2)}</td>`;
-                }
-            });
-
-            const finalAvg = semesterAverages.length > 0 ? semesterAverages.reduce((a, b) => a + b, 0) / semesterAverages.length : 0;
-            rowHTML += `<td class="${finalAvg < 60 ? 'failing-score' : ''}">${finalAvg.toFixed(2)}</td></tr>`;
-            bodyHTML += rowHTML;
-
-            if (subjectGrade.comment && subjectGrade.comment.trim() !== '') {
-                const colspan = document.querySelector('#gradeTable thead tr')?.cells.length || 1;
-                bodyHTML += `<tr class="comment-row"><td colspan="${colspan}"><span class="comment-label">Comment:</span> ${subjectGrade.comment}</td></tr>`;
-            }
-        });
-        return bodyHTML;
-    }
-
-    /**
-     * Builds the HTML for the table footer (tfoot) with period and semester averages.
-     * @param {Array<Object>} grades - The array of grade data for the student.
-     * @param {Array<Array<Object>>} semesters - An array of semester arrays.
-     * @returns {string} The inner HTML for the tfoot element.
-     */
-    function buildTableFooter(grades, semesters) {
-        let footerHTML = '<tr><th class="subject-col">Average</th>';
-        const overallSemesterAverages = [];
-
-        semesters.forEach(semesterPeriods => {
-            const periodAverages = [];
-            semesterPeriods.forEach(p => {
-                const periodTotal = grades.reduce((sum, current) => sum + (current[p.id] || 0), 0);
-                const avg = grades.length > 0 ? periodTotal / grades.length : 0;
-                footerHTML += `<td class="${avg < 60 ? 'failing-score' : ''}">${avg.toFixed(2)}</td>`;
-                periodAverages.push(avg);
-            });
-
-            const overallSemesterAvg = periodAverages.length > 0 ? periodAverages.reduce((a, b) => a + b, 0) / periodAverages.length : 0;
-            overallSemesterAverages.push(overallSemesterAvg);
-            if (semesterPeriods.length > 0) {
-                footerHTML += `<td class="${overallSemesterAvg < 60 ? 'failing-score' : ''}">${overallSemesterAvg.toFixed(2)}</td>`;
-            }
-        });
-
-        const finalOverallAvg = overallSemesterAverages.length > 0 ? overallSemesterAverages.reduce((a, b) => a + b, 0) / overallSemesterAverages.length : 0;
-        footerHTML += `<td class="${finalOverallAvg < 60 ? 'failing-score' : ''}">${finalOverallAvg.toFixed(2)}</td>`;
-        
-        // Set Overall Performance Comment based on this final average
-        setOverallPerformance(finalOverallAvg);
-
-        return footerHTML;
-    }
-
-    // --- Report Card Display Logic ---
-    function displayReportCard(studentData, studentId) {
-        document.getElementById('student-info-name').textContent = studentData.name;
-        document.getElementById('student-info-id').textContent = studentId;
-
-        const grades = studentData.grades;
-        const tableHead = document.querySelector('#gradeTable thead');
-        const tableBody = document.getElementById('grades-body');
-        const tableFoot = document.querySelector('#gradeTable tfoot');
-
-        if (!grades || grades.length === 0) {
-            tableHead.innerHTML = '';
-            tableFoot.innerHTML = '';
-            tableBody.innerHTML = '<tr><td colspan="100%">No grades found.</td></tr>';
             return;
         }
 
-        // 1. Dynamically determine active periods and their names from the data
-        const activePeriods = [];
-        const firstSubject = grades[0];
-        for (const key in firstSubject) {
-            if (key !== 'subject' && key !== 'comment') {
-                const isExam = key.startsWith('exam');
-                const num = parseInt(key.replace(/\D/g, '')) || '';
-                const name = isExam ? `Exam ${num}` : `${num}${getOrdinalSuffix(num)} Period`;
-                activePeriods.push({ id: key, name: name, type: isExam ? 'exam' : 'period' });
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/students/${id}`);
+            if (!response.ok) {
+                throw new Error('Student data not found.');
             }
+            const studentData = await response.json();
+
+            // Verify that the fetched student's name matches the input name (case-insensitive)
+            if (studentData.name.toLowerCase() !== name.toLowerCase()) {
+                throw new Error('Student name does not match the ID.');
+            }
+
+            currentStudentData = studentData;
+            displayReportCard(currentStudentData);
+
+        } catch (error) {
+            errorMessage.textContent = 'Invalid name or ID. Please try again.';
+            errorMessage.classList.remove('hidden');
+            console.error('Login failed:', error);
         }
-
-        // 2. Group periods into semesters
-        const semesters = groupPeriodsIntoSemesters(activePeriods);
-
-        // 3. Build and render all parts of the table
-        tableHead.innerHTML = buildTableHeader(semesters);
-        tableBody.innerHTML = buildTableBody(grades, semesters);
-        tableFoot.innerHTML = buildTableFooter(grades, semesters);
-
-        // 4. Set the print date
-        const today = new Date();
-        document.getElementById('report-date').textContent = today.toLocaleDateString();
     }
 
-    function setOverallPerformance(finalAvg) {
-        const gradeSpan = document.getElementById('overall-grade');
-        const commentP = document.getElementById('overall-comment');
-        let grade = '';
-        let comment = '';
+    /**
+     * Renders the report card view with the student's data.
+     * @param {object} student The student data object from the API.
+     */
+    function displayReportCard(student) {
+        // Populate student info
+        document.getElementById('student-info-name').textContent = student.name;
+        document.getElementById('student-info-id').textContent = student.id;
+        document.getElementById('report-date').textContent = new Date().toLocaleDateString();
 
+        // Render table
+        renderGradeTable(student.grades);
+
+        // Switch views
+        loginSection.classList.remove('active');
+        loginSection.classList.add('hidden');
+        reportSection.classList.remove('hidden');
+        reportSection.classList.add('active');
+    }
+
+    /**
+     * Dynamically builds the grades table from the student's grade data.
+     * @param {Array<object>} grades The array of grade objects for the student.
+     */
+    function renderGradeTable(grades) {
+        const tableHead = document.querySelector('#gradeTable thead');
+        const tableBody = document.getElementById('grades-body');
+        const sem1Row = document.getElementById('sem1-average-row');
+        const sem2Row = document.getElementById('sem2-average-row');
+        const overallGradeSpan = document.getElementById('overall-grade');
+
+        // Clear previous data
+        tableHead.innerHTML = '';
+        tableBody.innerHTML = '';
+        sem1Row.innerHTML = '';
+        sem2Row.innerHTML = '';
+
+        if (grades.length === 0) return;
+
+        // --- Determine periods from the first subject ---
+        const firstGrade = grades[0];
+        const periods = Object.keys(firstGrade).filter(key => key !== 'subject' && key !== 'comment');
+        const sem1Periods = periods.filter(p => p.startsWith('p1') || p.startsWith('p2') || p.startsWith('p3') || p.startsWith('exam1'));
+        const sem2Periods = periods.filter(p => p.startsWith('p4') || p.startsWith('p5') || p.startsWith('p6') || p.startsWith('exam2'));
+
+        // --- Build Table Header ---
+        let headerHTML = '<tr><th>Subject</th>';
+        periods.forEach(p => {
+            const periodName = p.startsWith('p') ? `Period ${p.substring(1)}` : `Exam ${p.substring(4)}`;
+            headerHTML += `<th>${periodName}</th>`;
+        });
+        headerHTML += '<th>Comments</th></tr>';
+        tableHead.innerHTML = headerHTML;
+
+        // --- Build Table Body ---
+        let totalPoints = 0;
+        let totalPossiblePoints = 0;
+        const semesterTotals = { sem1: 0, sem2: 0 };
+        const semesterCounts = { sem1: 0, sem2: 0 };
+
+        grades.forEach(grade => {
+            let rowHTML = `<tr><td>${grade.subject}</td>`;
+            periods.forEach(p => {
+                const score = grade[p] || 0;
+                rowHTML += `<td class="${score < 60 ? 'failing-score' : ''}">${score}</td>`;
+                totalPoints += score;
+                totalPossiblePoints += 100;
+
+                if (sem1Periods.includes(p)) {
+                    semesterTotals.sem1 += score;
+                    semesterCounts.sem1++;
+                }
+                if (sem2Periods.includes(p)) {
+                    semesterTotals.sem2 += score;
+                    semesterCounts.sem2++;
+                }
+            });
+            rowHTML += `<td>${grade.comment || ''}</td></tr>`;
+            tableBody.innerHTML += rowHTML;
+        });
+
+        // --- Calculate and Display Averages ---
+        const sem1Avg = (semesterCounts.sem1 > 0) ? (semesterTotals.sem1 / (semesterCounts.sem1 / grades.length)) : 0;
+        const sem2Avg = (semesterCounts.sem2 > 0) ? (semesterTotals.sem2 / (semesterCounts.sem2 / grades.length)) : 0;
+        const finalAvg = (totalPossiblePoints > 0) ? (totalPoints / (totalPossiblePoints / 100)) : 0;
+
+        // Semester 1 Average Row
+        if (sem1Periods.length > 0) {
+            sem1Row.innerHTML = `
+                <td colspan="${periods.length + 1}" class="average-label">Semester 1 Average</td>
+                <td class="${sem1Avg < 60 ? 'failing-score' : ''}">${sem1Avg.toFixed(2)}</td>
+            `;
+        }
+
+        // Semester 2 Average Row
+        if (sem2Periods.length > 0) {
+            sem2Row.innerHTML = `
+                <td colspan="${periods.length + 1}" class="average-label">Semester 2 Average</td>
+                <td class="${sem2Avg < 60 ? 'failing-score' : ''}">${sem2Avg.toFixed(2)}</td>
+            `;
+        }
+
+        // Final Overall Grade
+        overallGradeSpan.textContent = finalAvg.toFixed(2);
+        overallGradeSpan.className = finalAvg < 60 ? 'failing-score' : '';
+
+        // Set overall comment based on final average
+        const overallComment = document.getElementById('overall-comment');
         if (finalAvg >= 90) {
-            grade = 'A';
-            comment = 'Excellent work! Keep up the outstanding performance.';
+            overallComment.textContent = "Excellent work! Keep up the high standards.";
         } else if (finalAvg >= 80) {
-            grade = 'B';
-            comment = 'Great job! Consistently strong performance.';
+            overallComment.textContent = "Great job! Consistently strong performance.";
         } else if (finalAvg >= 70) {
-            grade = 'C';
-            comment = 'Good effort. Continue to work hard.';
+            overallComment.textContent = "Good effort. Continue to strive for improvement.";
         } else if (finalAvg >= 60) {
-            grade = 'D';
-            comment = 'Satisfactory. There is room for improvement.';
+            overallComment.textContent = "Satisfactory performance. Focus on areas needing improvement.";
         } else {
-            grade = 'F';
-            comment = 'Needs improvement. Please see the administration for guidance.';
+            overallComment.textContent = "Improvement is needed. Please see your advisor for a support plan.";
         }
-
-        gradeSpan.textContent = grade;
-        commentP.textContent = comment;
     }
 
-    function getOrdinalSuffix(i) {
-        if (!i) return "";
-        const j = i % 10,
-            k = i % 100;
-        if (j === 1 && k !== 11) return "st";
-        if (j === 2 && k !== 12) return "nd";
-        if (j === 3 && k !== 13) return "rd";
-        return "th";
+    /**
+     * Handles the logout process.
+     */
+    function handleLogout() {
+        // Clear state and form inputs
+        currentStudentData = null;
+        loginForm.reset();
+
+        // Switch views
+        reportSection.classList.remove('active');
+        reportSection.classList.add('hidden');
+        loginSection.classList.remove('hidden');
+        loginSection.classList.add('active');
     }
 
+    /**
+     * Triggers the browser's print dialog.
+     */
+    function handlePrint() {
+        window.print();
+    }
+
+    // --- Event Listeners ---
+    loginForm.addEventListener('submit', handleLogin);
+    logoutBtn.addEventListener('click', handleLogout);
+    printBtn.addEventListener('click', handlePrint);
 });
