@@ -146,13 +146,12 @@ function calculateAndDisplayAverages() {
 }
 
 // --- API Communication Layer ---
-const API_BASE_URL = 'https://online-report-card-frontend.onrender.com';
 const adminForm = document.getElementById('admin-form');
 const adminMessage = document.getElementById('admin-message');
 
 // Function to Fetch a single student's data from the backend
 async function getStudent(id) {
-    const response = await fetch(`${API_BASE_URL}/api/students/${id}`);
+    const response = await fetch(`/api/students/${id}`);
     if (!response.ok) {
         throw new Error('Student not found');
     }
@@ -161,7 +160,7 @@ async function getStudent(id) {
 
 // Function to Add a NEW Report Card via API
 async function addReportCard(studentData) {
-    const response = await fetch(`${API_BASE_URL}/api/students`, {
+    const response = await fetch(`/api/students`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(studentData),
@@ -173,7 +172,7 @@ async function addReportCard(studentData) {
 
 // Function to Update an EXISTING Report Card via API
 async function updateReportCard(id, studentData) {
-    const response = await fetch(`${API_BASE_URL}/api/students/${id}`, {
+    const response = await fetch(`/api/students/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(studentData),
@@ -185,7 +184,7 @@ async function updateReportCard(id, studentData) {
 
 // Function to Delete a Report Card via API
 async function deleteReportCard(id) {
-    const response = await fetch(`${API_BASE_URL}/api/students/${id}`, {
+    const response = await fetch(`/api/students/${id}`, {
         method: 'DELETE',
     });
     const result = await response.json();

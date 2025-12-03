@@ -3,7 +3,7 @@ const cors = require('cors');
 const path = require('path'); // Import the 'path' module
 const mongoose = require('mongoose');
 
-// --- Database Connection ---
+  // --- Database Connection ---
 // IMPORTANT: Your connection string should be stored as an environment variable, not here.
 const MONGO_URI = process.env.MONGO_URI || 'YOUR_FALLBACK_CONNECTION_STRING';
 
@@ -44,6 +44,16 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Add middleware to parse JSON bodies from incoming requests
 app.use(express.json());
+
+// API endpoint to GET all students
+app.get('/api/students', async (req, res) => {
+  try {
+    const students = await Student.find({});
+    res.json(students);
+  } catch (error) {
+    res.status(500).json({ error: 'Server error while fetching students' });
+  }
+});
 
 // API endpoint to GET a single student's data
 app.get('/api/students/:id', async (req, res) => {

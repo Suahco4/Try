@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin: Registered Students</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="section active">
+            <h1>Registered Students</h1>
+            <p>This is a list of all students currently in the database.</p>
+            
+            <div class="nav-back">
+                <a href="admin.html" class="back-link">← Back to Admin Panel</a>
+            </div>
+
+            <div id="student-list-container">
+                <p>Loading students...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const studentListContainer = document.getElementById('student-list-container');
+
+            async function fetchAndDisplayStudents() {
+                try {
+                    const response = await fetch('/api/students');
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    const students = await response.json();
+
+                    studentListContainer.innerHTML = ''; // Clear the 'Loading...' message
+
+                    if (students.length === 0) {
+                        studentListContainer.innerHTML = '<p>No students are registered in the database yet.</p>';
+                        return;
+                    }
+
+                    const studentList = document.createElement('ul');
+                    students.forEach(student => {
+                        const listItem = document.createElement('li');
+                        listItem.textContent = `Name: ${student.name} - ID: ${student._id}`;
+                        studentList.appendChild(listItem);
+                    });
+                    studentListContainer.appendChild(studentList);
+                } catch (error) {
+                    console.error('Failed to fetch students:', error);
+                    studentListContainer.innerHTML = '<p class="error">Could not load student data. Please check the console for errors.</p>';
+                }
+            }
+
+            fetchAndDisplayStudents();
+        });
+    </script>
+</body>
+</html>
