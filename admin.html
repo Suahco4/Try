@@ -5,6 +5,110 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin: Add Student Report Card</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* --- Layout Enhancements for Admin Form --- */
+        .admin-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .input-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .input-row input {
+            flex-grow: 1;
+        }
+        #subjects-management-section, #periods-management-section {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        .form-actions {
+            margin-top: 30px;
+            display: flex;
+            gap: 10px;
+        }
+    </style>
+    <style>
+        /* General Button Styling */
+        button, .button-link {
+            display: inline-block;
+            padding: 10px 15px;
+            border: 1px solid transparent;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: bold;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+            text-decoration: none;
+            line-height: 1.2;
+        }
+
+        /* Primary Action Buttons (Submit, Load) */
+        #submit-btn, #load-student-btn {
+            background-color: #3498db; /* Blue */
+            color: white;
+        }
+        #submit-btn:hover, #load-student-btn:hover {
+            background-color: #2980b9;
+        }
+
+        /* Secondary Action Buttons (Generate ID, Add Subject/Period) */
+        #generate-id-btn, #add-subject-btn, #add-regular-period-btn, #add-exam-period-btn {
+            background-color: #f0f0f0; /* Light Gray */
+            color: #333;
+            border: 1px solid #ccc;
+        }
+        #generate-id-btn:hover, #add-subject-btn:hover, #add-regular-period-btn:hover, #add-exam-period-btn:hover {
+            background-color: #e0e0e0;
+            border-color: #bbb;
+        }
+
+        /* Tertiary/Neutral Action (Cancel) */
+        #cancel-edit-btn {
+            background-color: transparent;
+            color: #555;
+            border: 1px solid #ccc;
+        }
+        #cancel-edit-btn:hover {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+
+        /* Destructive Action Button (Delete) */
+        #delete-student-btn {
+            background-color: #e74c3c; /* Red */
+            color: white;
+        }
+        #delete-student-btn:hover {
+            background-color: #c0392b;
+        }
+
+        /* Link as a Button */
+        .button-link {
+            background-color: #2ecc71; /* Green */
+            color: white;
+        }
+        .button-link:hover {
+            background-color: #27ae60;
+        }
+
+        /* Back to Portal Link as a Button */
+        .back-link {
+            background-color: #95a5a6; /* Gray */
+            color: white;
+        }
+        .back-link:hover {
+            background-color: #7f8c8d;
+        }
+
+    </style>
 </head>
 <body>
     <div class="container">
@@ -12,24 +116,20 @@
             <h1>Admin: Add Student Report Card</h1>
             <p>Add a new student's grades to the database.</p>
             
-            <!-- Navigation Link -->
-            <div class="nav-back">
-                <a href="index.html" class="back-link">← Back to Student Portal</a>
+            <!-- Navigation Links -->
+            <div class="admin-nav">
+                <a href="index.html" class="button-link back-link">← Back to Student Portal</a>
+                <a href="public/student-list.html" class="button-link">View All Registered Students</a>
             </div>
 
             <!-- Edit Student Section -->
             <div class="edit-section">
                 <h2>Edit Existing Student</h2>
-                <div class="form-group">
+                <div class="form-group input-row">
                     <label for="edit-student-id">Enter Student ID to Load:</label>
                     <input type="text" id="edit-student-id" placeholder="e.g., 202412345">
                     <button type="button" id="load-student-btn">Load Student</button>
                 </div>
-            </div>
-
-            <!-- Registered Students List -->
-            <div class="registered-students-section">
-                <a href="public/student-list.html" class="button-link">View All Registered Students</a>
             </div>
 
             <form id="admin-form">
@@ -47,9 +147,9 @@
                 </div>
                 <div class="form-group">
                     <label for="student-id">Student ID:</label>
-                    <div class="student-id-row">
-                        <input type="text" id="student-id" placeholder="e.g., 202499999" required class="student-id-input">
-                        <button type="button" id="generate-id-btn">Generate ID</button>
+                    <div class="input-row">
+                        <input type="text" id="student-id" placeholder="e.g., 202499999" required>
+                        <button type="button" id="generate-id-btn" title="Generate a new unique student ID">Generate ID</button>
                     </div>
                 </div>
 
@@ -68,8 +168,8 @@
                     <div id="active-periods-container">
                         <!-- Active periods will be dynamically generated here -->
                     </div>
-                    <div class="periods-input-row">
-                        <input type="text" id="new-period-name-input" placeholder="e.g., Midterm Exam" class="periods-input-grow">
+                    <div class="input-row">
+                        <input type="text" id="new-period-name-input" placeholder="e.g., Midterm Exam">
                         <button type="button" id="add-regular-period-btn">Add Regular Period</button>
                         <button type="button" id="add-exam-period-btn">Add Exam Period</button>
                     </div>
@@ -93,10 +193,11 @@
                         <span>Final Overall Avg: <strong id="avg-final">0.00</strong></span>
                     </div>
                 </div>
-
-                <button type="submit" id="submit-btn">Add Student to Database</button>
-                <button type="button" id="cancel-edit-btn" class="btn-secondary hidden">Cancel Edit</button>
-                <button type="button" id="delete-student-btn" class="btn-danger hidden">Delete Student</button>
+                <div class="form-actions">
+                    <button type="submit" id="submit-btn">Add Student to Database</button>
+                    <button type="button" id="cancel-edit-btn" class="hidden">Cancel Edit</button>
+                    <button type="button" id="delete-student-btn" class="hidden">Delete Student</button>
+                </div>
             </form>
             <p id="admin-message" class="error hidden"></p>
         </div>
@@ -104,5 +205,4 @@
 
     <script src="admin.js"></script>
 </body>
-
 </html>

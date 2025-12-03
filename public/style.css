@@ -12,13 +12,14 @@ body {
 }
 
 .container {
-    max-width: 800px;
+    max-width: 900px;
     margin: 0 auto;
     padding: 20px;
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-direction: column;
 }
 
 .section {
@@ -27,12 +28,12 @@ body {
     border-radius: 10px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
     width: 100%;
-    text-align: center;
 }
 
 .section h1 {
     color: #2c3e50;
     margin-bottom: 10px;
+    text-align: center;
 }
 
 .section p {
@@ -67,11 +68,13 @@ button {
     border-radius: 5px;
     cursor: pointer;
     font-size: 16px;
-    transition: background 0.3s;
+    transition: background-color 0.3s, transform 0.2s;
+    font-weight: 600;
 }
 
 button:hover {
-    background: #2980b9;
+    background-color: #2980b9;
+    transform: translateY(-1px);
 }
 
 .btn-secondary {
@@ -80,6 +83,12 @@ button:hover {
 
 .btn-secondary:hover {
     background: #7f8c8d;
+}
+.btn-danger {
+    background-color: #e74c3c;
+}
+.btn-danger:hover {
+    background-color: #c0392b;
 }
 
 .error {
@@ -177,6 +186,60 @@ button:hover {
         min-width: 40px;
     }
 }
+
+/* --- Admin Page Specific Enhancements --- */
+
+.nav-back-link {
+    margin-bottom: 25px;
+    text-align: center;
+}
+.nav-back-link a {
+    text-decoration: none;
+    color: #3498db;
+    font-weight: bold;
+}
+
+/* Form Section Styling */
+.form-section {
+    border: 1px solid #e0e0e0;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    background-color: #fdfdfd;
+}
+
+.form-section legend {
+    font-weight: bold;
+    font-size: 1.2em;
+    color: #34495e;
+    padding: 0 10px;
+    margin-left: 10px;
+}
+
+/* Input with Button Group */
+.input-button-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+.input-button-group .flex-grow {
+    flex-grow: 1;
+}
+.input-button-group button {
+    padding: 10px 15px; /* Match input height */
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+/* Form Actions */
+.form-actions {
+    text-align: right;
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
 /* Admin-Specific Styles */
 .subject-group {
     background: #f8f9fa;
@@ -209,11 +272,6 @@ button:hover {
     color: #27ae60 !important;  /* Green for success messages */
 }
 
-/* Hide/show for extra subjects */
-.subject-group.hidden {
-    display: none;
-}
-
 /* Styles for Real-time Averages Box */
 .overall-averages {
     background: #ecf0f1;
@@ -221,12 +279,6 @@ button:hover {
     padding: 15px;
     margin: 20px 0;
     border-radius: 5px;
-}
-
-.overall-averages h3 {
-    text-align: center;
-    color: #2c3e50;
-    margin-bottom: 15px;
 }
 
 .avg-box {
@@ -246,6 +298,36 @@ button:hover {
     justify-content: space-around;
     font-weight: bold;
     color: #34495e;
+}
+
+/* Period & Subject Management */
+.active-periods-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+.period-tag {
+    background-color: #e0eafc;
+    color: #34495e;
+    padding: 5px 10px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+}
+.remove-period-btn, .remove-subject-btn {
+    background: #bdc3c7;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    margin-left: 8px;
+    padding: 0;
+    line-height: 18px;
+    text-align: center;
 }
 
 /* Utility class for highlighting failing scores */
@@ -364,4 +446,21 @@ button:hover {
 
 .lowest-score {
     background-color: #f8d7da; /* Light red */
+}
+
+/* --- General Responsive Adjustments --- */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+    .section {
+        padding: 20px;
+    }
+    .input-row, .admin-nav {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .input-row input {
+        width: 100%;
+    }
 }

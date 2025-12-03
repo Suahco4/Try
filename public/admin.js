@@ -147,7 +147,7 @@ function calculateAndDisplayAverages() {
 }
 
 // --- API Communication Layer ---
-const API_BASE_URL = 'https://online-report-card-frontend.onrender.com';
+const API_BASE_URL = 'https://online-report-card-frontend.onrender.com'; // Point to your local backend server
 const adminForm = document.getElementById('admin-form');
 const adminMessage = document.getElementById('admin-message');
 

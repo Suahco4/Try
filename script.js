@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- State ---
     let currentStudentData = null;
+    const API_BASE_URL = 'https://online-report-card-frontend.onrender.com'; // Deployed backend
 
     // --- Functions ---
 
@@ -31,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const response = await fetch(`/api/students/${id}`);
+            const response = await fetch(`${API_BASE_URL}/api/students/${id}`);
             if (!response.ok) {
                 throw new Error('Student data not found.');
             }

@@ -141,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const semesterScores = semesterPeriods.map(p => subjectGrade[p.id] || 0);
                 semesterScores.forEach(score => {
                 let classList = '';
-                if (score < 60) classList += 'failing-score';
+                if (score < 60) classList += ' failing-score';
                 if (score === maxScore && maxScore !== minScore) classList += ' highest-score';
                 if (score === minScore && maxScore !== minScore) classList += ' lowest-score';
 
@@ -151,12 +151,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const semesterAvg = semesterScores.length > 0 ? semesterScores.reduce((a, b) => a + b, 0) / semesterScores.length : 0;
                 semesterAverages.push(semesterAvg);
                 if (semesterPeriods.length > 0) {
-                    rowHTML += `<td class="${semesterAvg < 60 ? 'failing-score' : ''}">${semesterAvg.toFixed(2)}</td>`;
+                    rowHTML += `<td data-label="Sem ${semesters.indexOf(semesterPeriods) + 1} Avg" class="${semesterAvg < 60 ? 'failing-score' : ''}">${semesterAvg.toFixed(2)}</td>`;
                 }
             });
 
             const finalAvg = semesterAverages.length > 0 ? semesterAverages.reduce((a, b) => a + b, 0) / semesterAverages.length : 0;
-            rowHTML += `<td class="${finalAvg < 60 ? 'failing-score' : ''}">${finalAvg.toFixed(2)}</td></tr>`;
+            rowHTML += `<td data-label="Final Avg" class="${finalAvg < 60 ? 'failing-score' : ''}">${finalAvg.toFixed(2)}</td></tr>`;
             bodyHTML += rowHTML;
 
             if (subjectGrade.comment && subjectGrade.comment.trim() !== '') {
@@ -182,19 +182,19 @@ document.addEventListener('DOMContentLoaded', () => {
             semesterPeriods.forEach(p => {
                 const periodTotal = grades.reduce((sum, current) => sum + (current[p.id] || 0), 0);
                 const avg = grades.length > 0 ? periodTotal / grades.length : 0;
-                footerHTML += `<td class="${avg < 60 ? 'failing-score' : ''}">${avg.toFixed(2)}</td>`;
+                footerHTML += `<td data-label="${p.name}" class="${avg < 60 ? 'failing-score' : ''}">${avg.toFixed(2)}</td>`;
                 periodAverages.push(avg);
             });
 
             const overallSemesterAvg = periodAverages.length > 0 ? periodAverages.reduce((a, b) => a + b, 0) / periodAverages.length : 0;
             overallSemesterAverages.push(overallSemesterAvg);
             if (semesterPeriods.length > 0) {
-                footerHTML += `<td class="${overallSemesterAvg < 60 ? 'failing-score' : ''}">${overallSemesterAvg.toFixed(2)}</td>`;
+                footerHTML += `<td data-label="Sem ${semesters.indexOf(semesterPeriods) + 1} Avg" class="${overallSemesterAvg < 60 ? 'failing-score' : ''}">${overallSemesterAvg.toFixed(2)}</td>`;
             }
         });
 
         const finalOverallAvg = overallSemesterAverages.length > 0 ? overallSemesterAverages.reduce((a, b) => a + b, 0) / overallSemesterAverages.length : 0;
-        footerHTML += `<td class="${finalOverallAvg < 60 ? 'failing-score' : ''}">${finalOverallAvg.toFixed(2)}</td>`;
+        footerHTML += `<td data-label="Final Avg" class="${finalOverallAvg < 60 ? 'failing-score' : ''}">${finalOverallAvg.toFixed(2)}</td>`;
         
         // Set Overall Performance Comment based on this final average
         setOverallPerformance(finalOverallAvg);
