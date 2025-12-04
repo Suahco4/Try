@@ -193,6 +193,24 @@ button:hover {
     font-weight: bold;
 }
 
+/* --- Grade Legend --- */
+.grade-legend {
+    text-align: center;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    margin: 30px 0;
+}
+.grade-legend h4 {
+    margin: 0 0 10px 0;
+}
+.legend-items {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
 /* --- Overall & Signature Sections --- */
 .overall {
     text-align: center;

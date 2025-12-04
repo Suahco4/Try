@@ -7,6 +7,13 @@
     <link rel="stylesheet" href="style.css">
     <!-- Link to Google Fonts for a cleaner typeface -->
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Favicon -->
+     <link rel="icon" type="image/png" href="favicon-96x96.png" sizes="96x96" />
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+<link rel="shortcut icon" href="favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-title" content="PEDS Progress Report" />
+<link rel="manifest" href="site.webmanifest" />
 </head>
 <body>
     <div class="container">
@@ -16,12 +23,12 @@
             <p>Enter your student's name and ID to view the progress report.</p>
             <form id="login-form">
                 <div class="form-group">
-                    <label for="login-student-name">Student's Full Name:</label>
-                    <input type="text" id="login-student-name" placeholder="e.g., John Doe" required>
+                    <label for="student-name">Student's Full Name:</label>
+                    <input type="text" id="student-name" placeholder="e.g., John Doe" required>
                 </div>
                 <div class="form-group">
-                    <label for="login-student-id">Student ID:</label>
-                    <input type="text" id="login-student-id" placeholder="e.g., 12345" required>
+                    <label for="student-id">Student ID:</label>
+                    <input type="text" id="student-id" placeholder="e.g., 12345" required>
                 </div>
                 <button type="submit">View Report Card</button>
             </form>
@@ -40,6 +47,12 @@
             <div class="student-info">
                 <h2 id="student-info-name"></h2>
                 <p>Student ID: <span id="student-info-id"></span></p>
+            </div>
+            <div class="report-controls">
+                <label for="grade-format-toggle">Show Letter Grades</label>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="grade-format-toggle">
+                </label>
             </div>
             <table id="gradeTable" class="grades-table">
                 <thead>
@@ -60,6 +73,17 @@
             <div class="overall">
                 <h3>Overall Performance: <span id="overall-grade"></span></h3>
                 <p id="overall-comment"></p>
+            </div>
+            <div class="grade-legend">
+                <h4>Grade Legend</h4>
+                <p>The letter grades correspond to the following numerical ranges:</p>
+                <div class="legend-items">
+                    <span><strong>A:</strong> 90-100 = Excellent</span>
+                    <span><strong>B:</strong> 80-89 = Great</span>
+                    <span><strong>C:</strong> 70-79 = Good</span>
+                    <span><strong>D:</strong> 60-69 = Satisfactory</span>
+                    <span><strong>F:</strong> Below 60 = Needs Improvement</span>
+                </div>
             </div>
             <div class="signature-section">
                 <div class="signature-box">

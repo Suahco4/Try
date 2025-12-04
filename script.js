@@ -4,12 +4,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const reportSection = document.getElementById('report-section');
     const loginForm = document.getElementById('login-form');
     const errorMessage = document.getElementById('error-message');
-    const studentNameInput = document.getElementById('login-student-name');
-    const studentIdInput = document.getElementById('login-student-id');
+    const studentNameInput = document.getElementById('student-name');
+    const studentIdInput = document.getElementById('student-id');
     const logoutBtn = document.getElementById('logout-btn');
     const printBtn = document.getElementById('print-btn');
+    const gradeFormatToggle = document.getElementById('grade-format-toggle');
 
     // --- State ---
+    let useLetterGrades = false;
     let currentStudentData = null;
     const API_BASE_URL = 'https://online-report-card-frontend.onrender.com'; // Deployed backend
 
@@ -54,6 +56,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
+     * Toggles the grade format and re-renders the report card.
+     */
+    function handleGradeFormatToggle() {
+        useLetterGrades = gradeFormatToggle.checked;
+        if (currentStudentData) displayReportCard(currentStudentData);
+    }
+
+    /**
      * Renders the report card view with the student's data.
      * @param {object} student The student data object from the API.
      */
@@ -62,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('report-school-name').textContent = student.schoolName || 'School Name Not Provided';
         document.getElementById('report-school-address').textContent = student.schoolAddress || '';
         document.getElementById('student-info-name').textContent = student.name;
-        document.getElementById('student-info-id').textContent = student.id;
+        document.getElementById('student-info-id').textContent = student._id;
         document.getElementById('report-date').textContent = new Date().toLocaleDateString();
 
         // Render table
@@ -74,6 +84,20 @@ document.addEventListener('DOMContentLoaded', () => {
         reportSection.classList.remove('hidden');
         reportSection.classList.add('active');
     }
+
+    /**
+     * Converts a numerical score to a letter grade.
+     * @param {number} score The numerical score.
+     * @returns {string} The corresponding letter grade.
+     */
+    function getLetterGrade(score) {
+        if (score >= 90) return 'A';
+        if (score >= 80) return 'B';
+        if (score >= 70) return 'C';
+        if (score >= 60) return 'D';
+        return 'F';
+    }
+
 
     /**
      * Dynamically builds the grades table from the student's grade data.
@@ -119,7 +143,8 @@ document.addEventListener('DOMContentLoaded', () => {
             let rowHTML = `<tr><td>${grade.subject}</td>`;
             periods.forEach(p => {
                 const score = grade[p] || 0;
-                rowHTML += `<td class="${score < 60 ? 'failing-score' : ''}">${score}</td>`;
+                const displayValue = useLetterGrades ? getLetterGrade(score) : score;
+                rowHTML += `<td class="${score < 60 ? 'failing-score' : ''}">${displayValue}</td>`;
                 totalPoints += score;
                 totalPossiblePoints += 100;
 
@@ -141,11 +166,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const sem2Avg = (semesterCounts.sem2 > 0) ? (semesterTotals.sem2 / (semesterCounts.sem2 / grades.length)) : 0;
         const finalAvg = (totalPossiblePoints > 0) ? (totalPoints / (totalPossiblePoints / 100)) : 0;
 
+        const sem1Display = useLetterGrades ? getLetterGrade(sem1Avg) : sem1Avg.toFixed(2);
+        const sem2Display = useLetterGrades ? getLetterGrade(sem2Avg) : sem2Avg.toFixed(2);
+        const finalDisplay = useLetterGrades ? getLetterGrade(finalAvg) : finalAvg.toFixed(2);
         // Semester 1 Average Row
         if (sem1Periods.length > 0) {
             sem1Row.innerHTML = `
                 <td colspan="${periods.length}" class="average-label">Semester 1 Average</td>
-                <td class="${sem1Avg < 60 ? 'failing-score' : ''}">${sem1Avg.toFixed(2)}</td>
+                <td class="${sem1Avg < 60 ? 'failing-score' : ''}">${sem1Display}</td>
             `;
         }
 
@@ -153,12 +181,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (sem2Periods.length > 0) {
             sem2Row.innerHTML = `
                 <td colspan="${periods.length}" class="average-label">Semester 2 Average</td>
-                <td class="${sem2Avg < 60 ? 'failing-score' : ''}">${sem2Avg.toFixed(2)}</td>
+                <td class="${sem2Avg < 60 ? 'failing-score' : ''}">${sem2Display}</td>
             `;
         }
 
         // Final Overall Grade
-        overallGradeSpan.textContent = finalAvg.toFixed(2);
+        overallGradeSpan.textContent = finalDisplay;
         overallGradeSpan.className = finalAvg < 60 ? 'failing-score' : '';
 
         // Set overall comment based on final average
@@ -202,4 +230,5 @@ document.addEventListener('DOMContentLoaded', () => {
     loginForm.addEventListener('submit', handleLogin);
     logoutBtn.addEventListener('click', handleLogout);
     printBtn.addEventListener('click', handlePrint);
+    gradeFormatToggle.addEventListener('change', handleGradeFormatToggle);
 });
